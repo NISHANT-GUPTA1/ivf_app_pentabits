@@ -1,0 +1,156 @@
+import { useState } from 'react';
+import { AlertCircle, CheckCircle2, Save, X } from 'lucide-react';
+import type { EmbryoResult } from '../../types/embryo';
+
+interface OverrideControlsProps {
+    embryo: EmbryoResult;
+    onUpdateEmbryo: (updatedEmbryo: EmbryoResult) => void;
+}
+
+export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsProps) {
+    const [overrideScore, setOverrideScore] = useState<number | ''>(embryo.overrideScore || '');
+    const [overrideReason, setOverrideReason] = useState(embryo.overrideReason || '');
+    const [manualGrade, setManualGrade] = useState(embryo.manualGrade || '');
+    const [notes, setNotes] = useState(embryo.notes || '');
+
+    const handleSubmit = () => {
+        onUpdateEmbryo({
+            ...embryo,
+            overrideScore: typeof overrideScore === 'number' ? overrideScore : undefined,
+            overrideReason,
+            manualGrade,
+            notes
+        });
+    };
+
+    return (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
+            <div className="flex items-start gap-4 mb-2">
+                <AlertCircle className="size-6 text-amber-500 flex-shrink-0" />
+                <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Embryologist Override Controls</h3>
+                    <p className="text-sm text-gray-500">
+                        Professional assessment takes precedence over AI scoring. All overrides are logged for quality assurance.
+                    </p>
+                </div>
+            </div>
+
+            {/* Current Score Bar */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium text-gray-700">Current AI Score</span>
+                    <span className="text-2xl font-bold text-blue-600">{embryo.viabilityScore}</span>
+                </div>
+                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                        className="h-full bg-blue-600 rounded-full"
+                        style={{ width: `${embryo.viabilityScore}%` }}
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+                {/* Left Column */}
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Override Score (0-100)
+                        </label>
+                        <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={overrideScore}
+                            onChange={(e) => setOverrideScore(Number(e.target.value))}
+                            placeholder="Enter new viability score"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Provide your professional assessment score</p>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Override Reason <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                            value={overrideReason}
+                            onChange={(e) => setOverrideReason(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                        >
+                            <option value="">Select reason for override</option>
+                            <option value="morphology">Morphological Anomaly</option>
+                            <option value="development">Developmental Delay</option>
+                            <option value="clinical">Clinical History Factor</option>
+                            <option value="technical">Image Quality Issue</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Manual Grade Assignment
+                        </label>
+                        <select
+                            value={manualGrade}
+                            onChange={(e) => setManualGrade(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                        >
+                            <option value="">Select embryo grade</option>
+                            <option value="5AA">5AA (Excellent)</option>
+                            <option value="4AA">4AA (Very Good)</option>
+                            <option value="3BB">3BB (Good)</option>
+                            <option value="2CC">2CC (Fair)</option>
+                        </select>
+                        <p className="text-xs text-gray-500 mt-1">Gardner grading system classification</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Clinical Notes Full Width */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Clinical Notes
+                </label>
+                <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Add detailed observations and rationale..."
+                    rows={3}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">Document specific morphological features or clinical considerations</p>
+            </div>
+
+            {/* Actions */}
+            <div className="pt-4 flex gap-3">
+                <button
+                    onClick={handleSubmit}
+                    className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                >
+                    <Save className="size-4" />
+                    Submit Override
+                </button>
+                <button
+                    onClick={() => {
+                        setOverrideScore('');
+                        setOverrideReason('');
+                        setManualGrade('');
+                        setNotes('');
+                    }}
+                    className="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-lg font-medium hover:bg-gray-50 flex items-center gap-2"
+                >
+                    <X className="size-4" />
+                    Clear
+                </button>
+            </div>
+
+            {/* Audit Note */}
+            <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
+                <CheckCircle2 className="size-4" />
+                All override actions are recorded in the audit trail with timestamp for compliance.
+            </div>
+        </div>
+    );
+}
