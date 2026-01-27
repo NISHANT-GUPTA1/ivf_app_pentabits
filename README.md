@@ -9,7 +9,7 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [The Problem We Solve](#the-problem-we-solve)
@@ -26,11 +26,11 @@
 
 ---
 
-## 🎯 Overview
+## Overview
 
 The **Embryo Viability Analysis Platform** is a cutting-edge web application that combines artificial intelligence with embryology to provide real-time, objective assessment of embryo quality. Our platform empowers IVF clinics to make data-driven decisions for embryo transfer, improving success rates and patient outcomes.
 
-### What Makes Us Different
+### Primary Features
 
 - **Real-time AI Processing**: Upload embryo images and receive instant viability scores
 - **Ensemble Model Approach**: 3 trained ML models working together for robust predictions
@@ -60,9 +60,9 @@ Our platform addresses these challenges by:
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🎨 **1. Cycle Overview Dashboard**
+### **1. Cycle Overview Dashboard**
 ![Dashboard Overview](./images/image.png)
 
 - Real-time visualization of all embryos in the current cycle
@@ -102,21 +102,21 @@ Our platform addresses these challenges by:
 - **Cell uniformity metrics**
 - **Comparative morphology** across embryos
 
-### 📈 **5. Viability Insights**
+###  **5. Viability Insights**
 
 - Predictive analytics for implantation potential
 - Success probability estimation
 - Risk factor identification
 - Historical outcome correlation
 
-### 🔄 **6. Embryo Comparison**
+###  **6. Embryo Comparison**
 
 - Side-by-side comparison of up to 4 embryos
 - Feature-by-feature analysis grid
 - Visual similarity detection
 - Transfer decision support
 
-### 📄 **7. Report Generation**
+###  **7. Report Generation**
 
 - Comprehensive PDF/TXT reports
 - Include all analysis data, images, and recommendations
@@ -125,7 +125,7 @@ Our platform addresses these challenges by:
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ### System Overview
 
@@ -579,14 +579,6 @@ We welcome contributions! Please follow these steps:
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- **Figma Design**: Original design inspiration from [Embryo Viability Analysis Figma](https://www.figma.com/design/fKbup00EpADWClMQoH3XXK/Embryo-Viability-Analysis)
-- **ML Training Data**: Anonymized embryo images from partner IVF clinics
-- **UI Components**: Built on [Radix UI](https://www.radix-ui.com/) and [Shadcn/ui](https://ui.shadcn.com/)
 
 ---
 
