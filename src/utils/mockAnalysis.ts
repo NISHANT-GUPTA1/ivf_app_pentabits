@@ -16,7 +16,7 @@ export function generateMockEmbryos(): EmbryoResult[] {
   const numEmbryos = 6;
 
   for (let i = 0; i < numEmbryos; i++) {
-    const viabilityScore = generateViabilityScore(i, numEmbryos);
+    const viabilityScore = generateViabilityScore(i);
     const features = generateFeatures(viabilityScore);
     const keyFindings = generateKeyFindings(features, viabilityScore);
     const recommendation = generateRecommendation(viabilityScore);
@@ -42,7 +42,7 @@ export function generateMockEmbryos(): EmbryoResult[] {
   return results;
 }
 
-function generateViabilityScore(index: number, total: number): number {
+function generateViabilityScore(index: number): number {
   const baseScores = [87, 82, 74, 68, 56, 45];
   const score = baseScores[index % baseScores.length] || 60;
   const variation = Math.floor(Math.random() * 6) - 3;
@@ -70,7 +70,7 @@ function generateFeatures(score: number): EmbryoFeatures {
   }
 }
 
-function generateKeyFindings(features: EmbryoFeatures, score: number): string[] {
+function generateKeyFindings(_features: EmbryoFeatures, score: number): string[] {
   const findings: string[] = [];
 
   if (score >= 80) {

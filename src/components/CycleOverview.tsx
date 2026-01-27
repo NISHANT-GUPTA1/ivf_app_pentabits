@@ -15,7 +15,7 @@ interface CycleOverviewProps {
   onUpdateEmbryo: (updated: EmbryoResult) => void;
 }
 
-export function CycleOverview({ embryoData, activeSection, onUpdateEmbryo }: CycleOverviewProps) {
+export function CycleOverview({ embryoData, onUpdateEmbryo }: CycleOverviewProps) {
   const [selectedEmbryo, setSelectedEmbryo] = useState<EmbryoResult | null>(
     embryoData.length > 0 ? embryoData[0] : null
   );
