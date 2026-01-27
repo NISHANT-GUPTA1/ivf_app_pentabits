@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+	:root {
+		--primary-pink: #F3B7C4;
+		--soft-blush: #F8DDE5;
+		--lavender-pink: #D8C6E0;
+		--medical-teal: #6FAFB5;
+		--charcoal: #333333;
+		--light-grey: #E6E6E6;
+	}
+  
+	body {
+		background-color: var(--soft-blush);
+		color: var(--charcoal);
+	}
+}

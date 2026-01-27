@@ -28,26 +28,26 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
     };
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
+            <div className="bg-white rounded-xl border border-[#E6E6E6] p-6 space-y-6">
             <div className="flex items-start gap-4 mb-2">
                 <AlertCircle className="size-6 text-amber-500 flex-shrink-0" />
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Embryologist Override Controls</h3>
-                    <p className="text-sm text-gray-500">
-                        Professional assessment takes precedence over AI scoring. All overrides are logged for quality assurance.
+                    <h3 className="text-lg font-semibold text-charcoal">Embryologist Override Controls</h3>
+                    <p className="text-sm text-charcoal/60">
+                        Professional assessment takes precedence over system scoring. All overrides are logged for quality assurance.
                     </p>
                 </div>
             </div>
 
             {/* Current Score Bar */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-blush p-4 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium text-gray-700">Current AI Score</span>
-                    <span className="text-2xl font-bold text-blue-600">{embryo.viabilityScore}</span>
+                        <span className="font-medium text-charcoal">Current Score</span>
+                        <span className="text-2xl font-bold text-teal-medical">{embryo.viabilityScore}</span>
                 </div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-2 bg-[#E6E6E6] rounded-full overflow-hidden">
                     <div
-                        className="h-full bg-blue-600 rounded-full"
+                            className="h-full bg-teal-medical rounded-full"
                         style={{ width: `${embryo.viabilityScore}%` }}
                     />
                 </div>
@@ -57,7 +57,7 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
                 {/* Left Column */}
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-charcoal mb-1">
                             Override Score (0-100)
                         </label>
                         <input
@@ -67,19 +67,19 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
                             value={overrideScore}
                             onChange={(e) => setOverrideScore(Number(e.target.value))}
                             placeholder="Enter new viability score"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full px-4 py-2 border border-[#E6E6E6] rounded-lg focus:ring-2 focus:ring-teal-medical focus:outline-none"
                         />
-                        <p className="text-xs text-gray-500 mt-1">Provide your professional assessment score</p>
+                            <p className="text-xs text-charcoal/60 mt-1">Provide your professional assessment score</p>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-charcoal mb-1">
                             Override Reason <span className="text-red-500">*</span>
                         </label>
                         <select
                             value={overrideReason}
                             onChange={(e) => setOverrideReason(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                                className="w-full px-4 py-2 border border-[#E6E6E6] rounded-lg focus:ring-2 focus:ring-teal-medical focus:outline-none bg-white"
                         >
                             <option value="">Select reason for override</option>
                             <option value="morphology">Morphological Anomaly</option>
@@ -93,13 +93,13 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
                 {/* Right Column */}
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-charcoal mb-1">
                             Manual Grade Assignment
                         </label>
                         <select
                             value={manualGrade}
                             onChange={(e) => setManualGrade(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                                className="w-full px-4 py-2 border border-[#E6E6E6] rounded-lg focus:ring-2 focus:ring-teal-medical focus:outline-none bg-white"
                         >
                             <option value="">Select embryo grade</option>
                             <option value="5AA">5AA (Excellent)</option>
@@ -107,14 +107,14 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
                             <option value="3BB">3BB (Good)</option>
                             <option value="2CC">2CC (Fair)</option>
                         </select>
-                        <p className="text-xs text-gray-500 mt-1">Gardner grading system classification</p>
+                            <p className="text-xs text-charcoal/60 mt-1">Gardner grading system classification</p>
                     </div>
                 </div>
             </div>
 
             {/* Clinical Notes Full Width */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                 <label className="block text-sm font-medium text-charcoal mb-1">
                     Clinical Notes
                 </label>
                 <textarea
@@ -122,16 +122,16 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Add detailed observations and rationale..."
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                        className="w-full px-4 py-2 border border-[#E6E6E6] rounded-lg focus:ring-2 focus:ring-teal-medical focus:outline-none resize-none"
                 />
-                <p className="text-xs text-gray-500 mt-1">Document specific morphological features or clinical considerations</p>
+                    <p className="text-xs text-charcoal/60 mt-1">Document specific morphological features or clinical considerations</p>
             </div>
 
             {/* Actions */}
             <div className="pt-4 flex gap-3">
                 <button
                     onClick={handleSubmit}
-                    className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                 >
                     <Save className="size-4" />
                     Submit Override
@@ -143,7 +143,7 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
                         setManualGrade('');
                         setNotes('');
                     }}
-                    className="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-lg font-medium hover:bg-gray-50 flex items-center gap-2"
+                        className="px-6 py-2.5 border border-[#E6E6E6] text-charcoal/70 rounded-lg font-medium hover:bg-blush flex items-center gap-2"
                 >
                     <X className="size-4" />
                     Clear
@@ -151,7 +151,7 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
             </div>
 
             {/* Audit Note */}
-            <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
+                <div className="flex items-center gap-2 p-3 bg-blush rounded-lg text-sm text-teal-medical">
                 <CheckCircle2 className="size-4" />
                 All override actions are recorded in the audit trail with timestamp for compliance.
             </div>

@@ -3,11 +3,11 @@ import type { EmbryoResult, EmbryoFeatures } from '../types/embryo';
 // Embryo images for mock data
 const embryoImages = [
   'https://images.unsplash.com/photo-1617178571938-7859791e1751?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaWNyb3Njb3BlJTIwZW1icnlvJTIwY2VsbHN8ZW58MXx8fHwxNzY5MzM4MDk3fDA&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1768498950658-87ecfe232b59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwbGFib3JhdG9yeSUyMHNjaWVuY2V8ZW58MXx8fHwxNzY5MzM4MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1767486366936-c41b4f767eb8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjZWxsJTIwYmlvbG9neSUyMG1pY3Jvc2NvcGV8ZW58MXx8fHwxNzY5MzA2NjE0fDA&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1758656803198-eeea35110219?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzY2llbnRpZmljJTIwcmVzZWFyY2glMjBjZWxsc3xlbnwxfHx8fDE3NjkzMzgwOTh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1766297246935-b0546638f63e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsYWJvcmF0b3J5JTIwbWljcm9zY29wZSUyMHZpZXd8ZW58MXx8fHwxNzY5MzM4MTAzfDA&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1758656803198-eeea35110219?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiaW9sb2d5JTIwY2VsbHMlMjByZXNlYXJjaHxlbnwxfHx8fDE3NjkzMzgwOTl8MA&ixlib=rb-4.1.0&q=80&w=1080'
+  '/images/image_2.png',
+  '/images/image_3.jpeg',
+  '/images/image_4.png',
+  '/images/image_5.jpeg',
+  '/images/images_6.jpeg'
 ];
 
 // Generate mock embryo data for the dashboard

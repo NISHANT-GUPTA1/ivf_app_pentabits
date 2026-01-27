@@ -13,6 +13,25 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {},
+        colors: {
+          primary: {
+            DEFAULT: '#F3B7C4',
+            pink: '#F3B7C4',
+          },
+          blush: {
+            DEFAULT: '#F8DDE5',
+          },
+          lavender: {
+            DEFAULT: '#D8C6E0',
+          },
+          teal: {
+            DEFAULT: '#6FAFB5',
+            medical: '#6FAFB5',
+          },
+          charcoal: {
+            DEFAULT: '#333333',
+          },
+        },
     },
   },
   plugins: [require("tailwindcss-animate")],

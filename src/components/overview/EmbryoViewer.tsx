@@ -26,28 +26,28 @@ export function EmbryoViewer({ embryo, onSelectEmbryo, allEmbryos }: EmbryoViewe
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'bg-green-500';
-    if (score >= 70) return 'bg-blue-500';
+      if (score >= 70) return 'bg-teal-medical';
     if (score >= 50) return 'bg-amber-500';
     return 'bg-red-500';
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 h-full">
+      <div className="bg-white rounded-lg border border-[#E6E6E6] p-6 h-full">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-900">Embryo Visualization</h3>
+          <h3 className="text-sm font-medium text-charcoal">Embryo Visualization</h3>
         <div className="flex items-center gap-2">
           <button
             onClick={handlePrevious}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-blush transition-colors"
           >
-            <ChevronLeft className="size-5 text-gray-600" />
+              <ChevronLeft className="size-5 text-charcoal/60" />
           </button>
-          <span className="text-sm text-gray-600">
+            <span className="text-sm text-charcoal/60">
             {currentIndex + 1} / {allEmbryos.length}
           </span>
           <button
             onClick={handleNext}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-blush transition-colors"
           >
             <ChevronRight className="size-5 text-gray-600" />
           </button>
@@ -74,9 +74,9 @@ export function EmbryoViewer({ embryo, onSelectEmbryo, allEmbryos }: EmbryoViewe
           </div>
         </div>
 
-        {/* AI Analysis indicators */}
+        {/* Analysis indicators */}
         <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
-          <p className="text-gray-300 text-xs mb-1">AI Analysis Complete</p>
+          <p className="text-gray-300 text-xs mb-1">Analysis Complete</p>
           <div className="flex gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse delay-100"></div>

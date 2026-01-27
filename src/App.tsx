@@ -32,7 +32,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-blush flex">
       <Sidebar
         activeSection={activeSection}
         onSectionChange={setActiveSection}
