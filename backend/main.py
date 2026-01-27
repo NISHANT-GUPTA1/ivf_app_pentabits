@@ -9,6 +9,7 @@ from pydantic import BaseModel
 import joblib
 import numpy as np
 from PIL import Image
+import cv2
 import io
 from typing import List, Dict
 import logging
@@ -39,12 +40,18 @@ app.add_middleware(
 # Global model storage
 models = {}
 
+class ModelPrediction(BaseModel):
+    model: str
+    prediction: int
+    probability_good: float
+    probability_not_good: float
+
 class PredictionResponse(BaseModel):
     prediction: str
     viability_score: float
     confidence: float
     confidence_level: str
-    model_predictions: List[Dict[str, float]]
+    model_predictions: List[ModelPrediction]
     features: Dict[str, float]
 
 
@@ -77,8 +84,9 @@ def load_models():
 
 def extract_features_fast(image_array: np.ndarray) -> Dict[str, float]:
     """
-    FAST feature extraction - minimal processing for speed
-    Extract 8 features that match model training
+    Extract 20 features to match model training (for single image instead of video)
+    The model expects: 8 morphological features (mean + std) + 4 temporal features
+    Since we have a single image, std values will be 0
     """
     try:
         # Convert to grayscale for analysis
@@ -87,33 +95,104 @@ def extract_features_fast(image_array: np.ndarray) -> Dict[str, float]:
         else:
             gray = image_array
         
-        # Flatten and normalize
-        gray_flat = gray.flatten() / 255.0
+        # Normalize
+        gray_normalized = gray / 255.0
         
+        # Extract base morphological features
+        std_dev = float(np.std(gray))
+        mean_intensity = float(np.mean(gray))
+        
+        # Contrast
+        contrast = float(np.max(gray) - np.min(gray))
+        
+        # Entropy
+        hist, _ = np.histogram(gray, bins=256, range=(0, 256))
+        hist = hist / hist.sum()
+        hist = hist[hist > 0]
+        entropy = float(-np.sum(hist * np.log2(hist)))
+        
+        # Edge density (Canny edges)
+        edges = cv2.Canny(gray.astype(np.uint8), 50, 150)
+        edge_density = float(np.sum(edges > 0) / edges.size)
+        
+        # Gradient magnitude
+        grad_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
+        grad_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
+        gradient_magnitude = float(np.mean(np.sqrt(grad_x**2 + grad_y**2)))
+        
+        # Circularity
+        _, binary = cv2.threshold(gray.astype(np.uint8), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if contours:
+            largest_contour = max(contours, key=cv2.contourArea)
+            area = cv2.contourArea(largest_contour)
+            perimeter = cv2.arcLength(largest_contour, True)
+            if perimeter > 0:
+                circularity = float(4 * np.pi * area / (perimeter ** 2))
+            else:
+                circularity = 0.0
+        else:
+            circularity = 0.0
+        
+        # Number of regions
+        num_regions = float(len(contours))
+        
+        # Temporal features (since we have single image, use frame=0 indicators)
+        frame_number = 0.0
+        time_elapsed = 0.0
+        
+        # Build feature vector with 20 features (mean, std pairs + temporal)
+        # For single image: std values are 0, mean values are the actual measurements
         features = {
-            'std_dev': float(np.std(gray_flat) * 100),  # Scale for better range
-            'mean_intensity': float(np.mean(gray_flat) * 100),
-            'contrast': float(np.max(gray_flat) - np.min(gray_flat)),
-            'edge_density': float(np.std(gray_flat) * 0.2),  # Simplified edge detection
-            'entropy': float(-np.mean([p * np.log2(p + 1e-10) for p in gray_flat if p > 0.01])),
-            'num_regions': float(len(np.unique(gray)) / 255.0),
-            'circularity': float(np.std(gray_flat) / (np.mean(gray_flat) + 0.001)),  # Simplified
-            'gradient_magnitude': float(np.std(np.gradient(gray_flat)))
+            'std_dev_mean': std_dev,
+            'std_dev_std': 0.0,
+            'mean_intensity_mean': mean_intensity,
+            'mean_intensity_std': 0.0,
+            'contrast_mean': contrast,
+            'contrast_std': 0.0,
+            'entropy_mean': entropy,
+            'entropy_std': 0.0,
+            'edge_density_mean': edge_density,
+            'edge_density_std': 0.0,
+            'gradient_magnitude_mean': gradient_magnitude,
+            'gradient_magnitude_std': 0.0,
+            'circularity_mean': circularity,
+            'circularity_std': 0.0,
+            'num_regions_mean': num_regions,
+            'num_regions_std': 0.0,
+            'frame_number': frame_number,
+            'time_elapsed': time_elapsed,
+            'frames_analyzed': 1.0,
+            'total_duration': 0.0
         }
         
         return features
     except Exception as e:
         logger.error(f"Error extracting features: {str(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         # Return default features if extraction fails
         return {
-            'std_dev': 50.0,
-            'mean_intensity': 50.0,
-            'contrast': 0.5,
-            'edge_density': 0.1,
-            'entropy': 3.5,
-            'num_regions': 0.5,
-            'circularity': 0.7,
-            'gradient_magnitude': 10.0
+            'std_dev_mean': 50.0,
+            'std_dev_std': 0.0,
+            'mean_intensity_mean': 128.0,
+            'mean_intensity_std': 0.0,
+            'contrast_mean': 100.0,
+            'contrast_std': 0.0,
+            'entropy_mean': 5.0,
+            'entropy_std': 0.0,
+            'edge_density_mean': 0.1,
+            'edge_density_std': 0.0,
+            'gradient_magnitude_mean': 30.0,
+            'gradient_magnitude_std': 0.0,
+            'circularity_mean': 0.5,
+            'circularity_std': 0.0,
+            'num_regions_mean': 10.0,
+            'num_regions_std': 0.0,
+            'frame_number': 0.0,
+            'time_elapsed': 0.0,
+            'frames_analyzed': 1.0,
+            'total_duration': 0.0
         }
 
 
@@ -137,16 +216,26 @@ def preprocess_image_fast(image_bytes: bytes) -> np.ndarray:
 
 def ensemble_predict(features: Dict[str, float]) -> Dict:
     """
-    Fast ensemble prediction using all 3 models
+    Fast ensemble prediction using all 3 models with 20 features
     """
     if not models:
         logger.error("No models loaded")
         raise HTTPException(status_code=500, detail="Models not loaded")
     
-    # Prepare feature vector in correct order
-    feature_names = ['std_dev', 'mean_intensity', 'contrast', 'edge_density', 
-                     'entropy', 'num_regions', 'circularity', 'gradient_magnitude']
-    X = np.array([[features.get(name, 50.0) for name in feature_names]])
+    # Prepare feature vector in correct order (20 features)
+    feature_names = [
+        'std_dev_mean', 'std_dev_std',
+        'mean_intensity_mean', 'mean_intensity_std',
+        'contrast_mean', 'contrast_std',
+        'entropy_mean', 'entropy_std',
+        'edge_density_mean', 'edge_density_std',
+        'gradient_magnitude_mean', 'gradient_magnitude_std',
+        'circularity_mean', 'circularity_std',
+        'num_regions_mean', 'num_regions_std',
+        'frame_number', 'time_elapsed',
+        'frames_analyzed', 'total_duration'
+    ]
+    X = np.array([[features.get(name, 0.0) for name in feature_names]])
     
     predictions = []
     probabilities = []
