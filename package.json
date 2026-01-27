@@ -1,6 +1,6 @@
 
   {
-      "name": "Embryo Viability Analysis",
+    "name": "embrya",
       "version": "0.1.0",
       "private": true,
       "dependencies": {

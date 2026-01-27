@@ -18,11 +18,9 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   ];
 
   return (
-    <div className="w-20 bg-white border-r border-gray-200 flex flex-col items-center py-6 gap-2">
+      <div className="w-20 bg-white border-r border-[#E6E6E6] flex flex-col items-center py-6 gap-2">
       <div className="mb-8">
-        <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-          <Microscope className="size-6 text-white" />
-        </div>
+        <img src="/logo.jpeg" alt="EMBRYA" className="w-10 h-10 rounded-lg object-cover" />
       </div>
 
       {sections.map((section) => {
@@ -34,15 +32,15 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
             key={section.id}
             onClick={() => onSectionChange(section.id)}
             className={`group relative w-14 h-14 rounded-lg flex items-center justify-center transition-all ${isActive
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'
+                  ? 'bg-[#FDF6F8] text-teal-medical'
+                  : 'text-charcoal/40 hover:bg-blush hover:text-teal-medical'
               }`}
             title={section.label}
           >
             <Icon className="size-6" />
 
             {/* Tooltip */}
-            <div className="absolute left-full ml-4 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-10">
+              <div className="absolute left-full ml-4 px-3 py-2 bg-charcoal text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-10">
               {section.label}
             </div>
           </button>

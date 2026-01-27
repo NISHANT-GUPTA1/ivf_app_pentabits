@@ -14,7 +14,7 @@ export function RankingList({ embryoData, selectedEmbryo, onSelectEmbryo }: Rank
   
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-50';
-    if (score >= 70) return 'text-blue-600 bg-blue-50';
+      if (score >= 70) return 'text-teal-medical bg-blush';
     if (score >= 50) return 'text-amber-600 bg-amber-50';
     return 'text-red-600 bg-red-50';
   };
@@ -27,10 +27,10 @@ export function RankingList({ embryoData, selectedEmbryo, onSelectEmbryo }: Rank
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
+     <div className="bg-white rounded-lg border border-[#E6E6E6] p-6">
       <div className="flex items-center gap-2 mb-4">
-        <Medal className="size-5 text-gray-600" />
-        <h3 className="text-sm font-medium text-gray-900">Embryo Rankings</h3>
+        <Medal className="size-5 text-teal-medical" />
+        <h3 className="text-sm font-medium text-charcoal">Embryo Rankings</h3>
       </div>
 
       <div className="space-y-3">
@@ -44,14 +44,14 @@ export function RankingList({ embryoData, selectedEmbryo, onSelectEmbryo }: Rank
               onClick={() => onSelectEmbryo(embryo)}
               className={`w-full text-left rounded-lg border transition-all ${
                 isSelected
-                  ? 'border-blue-500 bg-blue-50 shadow-sm'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    ? 'border-teal-medical bg-blush shadow-sm'
+                    : 'border-[#E6E6E6] hover:border-lavender hover:bg-blush'
               }`}
             >
               <div className="p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-charcoal">
                       {embryo.name}
                     </span>
                     {rankBadge && <span className="text-base">{rankBadge}</span>}
@@ -61,7 +61,7 @@ export function RankingList({ embryoData, selectedEmbryo, onSelectEmbryo }: Rank
                   </div>
                 </div>
 
-                <p className="text-xs text-gray-600 line-clamp-2">
+                  <p className="text-xs text-charcoal/70 line-clamp-2">
                   {embryo.recommendation}
                 </p>
               </div>
