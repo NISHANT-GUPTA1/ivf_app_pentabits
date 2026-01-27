@@ -67,31 +67,38 @@ export function CycleOverview({ embryoData, onUpdateEmbryo }: CycleOverviewProps
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-10">
-      {/* Left Column - 3/12 (25%) */}
-      <div className="col-span-1 lg:col-span-3 space-y-6 min-w-0">
+      {/* Left Column - 3/12 (25%) - Row 1 */}
+      <div className="col-span-1 lg:col-span-3 lg:row-start-1 space-y-6 min-w-0">
         <SummaryCards embryoData={embryoData} />
         <StageDistribution embryoData={embryoData} />
         <QualityTrends embryoData={embryoData} />
       </div>
 
-      {/* Center Column - 5/12 (40%) - Embryo Viewer as primary focus */}
-      <div className="col-span-1 lg:col-span-5 space-y-6 min-w-0">
+      {/* Center Column - 5/12 (40%) - Row 1 */}
+      <div className="col-span-1 lg:col-span-5 lg:row-start-1 space-y-6 min-w-0">
         <EmbryoViewer
           embryo={selectedEmbryo}
           onSelectEmbryo={setSelectedEmbryo}
           allEmbryos={embryoData}
         />
+      </div>
 
+      {/* Right Column Top - 4/12 (33%) - Row 1 */}
+      <div className="col-span-1 lg:col-span-4 lg:row-start-1 space-y-6 min-w-0">
+        <ViabilityChart embryoData={embryoData} selectedEmbryo={selectedEmbryo} />
+        <QualityMetricsChart embryoData={embryoData} />
+      </div>
+
+      {/* Wide Override Controls - Row 2, Left side (8 columns) */}
+      <div className="col-span-1 lg:col-start-1 lg:col-span-8 lg:row-start-2 min-w-0">
         <OverrideControls
           embryo={selectedEmbryo}
           onUpdateEmbryo={handleEmbryoUpdate}
         />
       </div>
 
-      {/* Right Column - 4/12 (33%) */}
-      <div className="col-span-1 lg:col-span-4 space-y-6 min-w-0">
-        <ViabilityChart embryoData={embryoData} selectedEmbryo={selectedEmbryo} />
-        <QualityMetricsChart embryoData={embryoData} />
+      {/* Embryo Rankings - Row 2, Right side (4 columns) */}
+      <div className="col-span-1 lg:col-start-9 lg:col-span-4 lg:row-start-2 min-w-0">
         <RankingList
           embryoData={embryoData}
           selectedEmbryo={selectedEmbryo}
