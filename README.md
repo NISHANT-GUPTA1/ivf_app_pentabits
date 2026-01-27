@@ -248,7 +248,7 @@ Our platform addresses these challenges by:
 
 ### 4. Results Display
 ![Results](./images/result.jpeg)
-![Results](./images/result2.jpeg)
+![Results](./images/result.jpeg)
 *Instant viability scores with confidence levels and detailed metrics*
 
 ### 5. Comparison View
