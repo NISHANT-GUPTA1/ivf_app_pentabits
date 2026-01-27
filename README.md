@@ -9,7 +9,7 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [The Problem We Solve](#the-problem-we-solve)
@@ -26,7 +26,7 @@
 
 ---
 
-## 🎯 Overview
+## Overview
 
 The **Embryo Viability Analysis Platform** is a cutting-edge web application that combines advanced modeling with embryology to provide real-time, objective assessment of embryo quality. Our platform empowers IVF clinics to make data-driven decisions for embryo transfer, improving success rates and patient outcomes.
 
@@ -40,7 +40,7 @@ The **Embryo Viability Analysis Platform** is a cutting-edge web application tha
 
 ---
 
-## 🔬 The Problem We Solve
+## The Problem We Solve
 
 ### Current Challenges in IVF
 
@@ -60,10 +60,10 @@ Our platform addresses these challenges by:
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🎨 **1. Cycle Overview Dashboard**
-![Dashboard Overview](./images/image.png)
+### **1. Cycle Overview Dashboard**
+![Dashboard Overview](./images/dashboard.jpeg)
 
 - Real-time visualization of all embryos in the current cycle
 - Interactive viability chart showing quality distribution
@@ -71,8 +71,8 @@ Our platform addresses these challenges by:
 - Summary cards with key performance indicators
 - Ranking system for transfer prioritization
 
-### 🧪 **2. Assessment Hub (Automated Processing)**
-![Assessment Hub](./localhost_3001_.png)
+### **2. Assessment Hub (Automated Processing)**
+![Assessment Hub](./images/embryo_assessment.jpeg)
 
 - **Drag-and-drop image upload** with live preview
 - **Real-time analysis** with processing status overlay
@@ -84,14 +84,14 @@ Our platform addresses these challenges by:
 - **Batch processing** capability for multiple embryos
 - **One-click report generation** (TXT format with full analysis)
 
-### 📊 **3. Development Journey**
+### **3. Development Journey**
 
 - Timeline-based visualization of embryo progression
 - Day-by-day morphological tracking
 - Cell division milestones
 - Time-lapse integration ready
 
-### 🔬 **4. Morphology Deep Dive**
+### **4. Morphology Deep Dive**
 
 - **Detailed cellular analysis**:
   - Inner Cell Mass (ICM) grading
@@ -102,21 +102,21 @@ Our platform addresses these challenges by:
 - **Cell uniformity metrics**
 - **Comparative morphology** across embryos
 
-### 📈 **5. Viability Insights**
+### **5. Viability Insights**
 
 - Predictive analytics for implantation potential
 - Success probability estimation
 - Risk factor identification
 - Historical outcome correlation
 
-### 🔄 **6. Embryo Comparison**
+### **6. Embryo Comparison**
 
 - Side-by-side comparison of up to 4 embryos
 - Feature-by-feature analysis grid
 - Visual similarity detection
 - Transfer decision support
 
-### 📄 **7. Report Generation**
+### **7. Report Generation**
 
 - Comprehensive PDF/TXT reports
 - Include all analysis data, images, and recommendations
@@ -125,7 +125,7 @@ Our platform addresses these challenges by:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ### System Overview
 
@@ -235,24 +235,24 @@ Our platform addresses these challenges by:
 ## 📸 Screenshots
 
 ### 1. Dashboard Overview
-![Dashboard](./images/image.png)
+![Dashboard](./images/dashboard.jpeg)
 *Main dashboard showing cycle overview with 6 embryos, viability distribution, and ranking list*
 
 ### 2. Assessment Hub (Before Upload)
-![Assessment Hub Empty](./localhost_3001_.png)
+![Assessment Hub Empty](./images/embryo_assessment.jpeg)
 *Drag-and-drop interface for batch image processing*
 
-### 3. Real-Time Processing
-*Live AI processing overlay showing analysis in progress*
+### 3. Devolpment State
+![Development state](./images/devlopment_state.jpeg)
+*Showing Devolpment State of the embryo*
 
 ### 4. Results Display
-![Results](./images/image.png)
+![Results](./images/result.jpeg)
+![Results](./images/result2.jpeg)
 *Instant viability scores with confidence levels and detailed metrics*
 
-### 5. Embryo Comparison View
-![Comparison](./ivf-analytics-dashboard-zr3wl16.public.builtwithrocket.new_\ (1).png)
-*Side-by-side comparison of multiple embryos*
-
+### 5. Comparison View
+![Comparison](./images/comparison.jpeg)
 ---
 
 ## 🛠️ Technology Stack
@@ -287,7 +287,7 @@ Our platform addresses these challenges by:
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -365,7 +365,7 @@ For production (Netlify):
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ivf_app_pentabits/
@@ -415,7 +415,7 @@ ivf_app_pentabits/
 
 ---
 
-## 🔌 API Documentation
+## API Documentation
 
 ### Base URL
 - **Development**: `http://localhost:8000`
@@ -485,7 +485,7 @@ Health check endpoint.
 
 ---
 
-## 🌐 Deployment
+## Deployment
 
 ### Frontend (Netlify)
 
@@ -548,7 +548,7 @@ git subtree push --prefix backend heroku main
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please follow these steps:
 
@@ -576,13 +576,13 @@ We welcome contributions! Please follow these steps:
 
 ---
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Figma Design**: Original design inspiration from [Embryo Viability Analysis Figma](https://www.figma.com/design/fKbup00EpADWClMQoH3XXK/Embryo-Viability-Analysis)
 - **ML Training Data**: Anonymized embryo images from partner IVF clinics
@@ -590,7 +590,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📧 Contact & Support
+## Contact & Support
 
 - **Project Maintainer**: [Ronit Jaiswal](https://github.com/Ronitjaiswal30)
 - **Issues**: [GitHub Issues](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues)
@@ -598,7 +598,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 🔮 Roadmap
+## Roadmap
 
 - [ ] Deploy backend to Railway/AWS
 - [ ] Add user authentication (OAuth 2.0)
@@ -613,7 +613,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 This software is intended for research and clinical decision support only. It should not be used as the sole basis for clinical decisions. All embryo transfer decisions should be made by qualified embryologists and reproductive endocrinologists in consultation with patients.
 
