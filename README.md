@@ -1,4 +1,4 @@
-# 🧬 Embryo Viability Analysis Platform
+# Embryo Viability Analysis Platform(Embrya)
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-BADGE-ID/deploy-status)](https://app.netlify.com/sites/YOUR-SITE-NAME/deploys)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -40,7 +40,7 @@ The **Embryo Viability Analysis Platform** is a cutting-edge web application tha
 
 ---
 
-## 🔬 The Problem We Solve
+##  The Problem We Solve
 
 ### Current Challenges in IVF
 
