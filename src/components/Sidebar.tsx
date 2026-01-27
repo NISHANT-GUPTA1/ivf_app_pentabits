@@ -17,10 +17,20 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
     { id: 'comparison' as const, icon: GitCompare, label: 'Comparison View' },
   ];
 
+  const handleLogoClick = () => {
+    onSectionChange('overview');
+  };
+
   return (
       <div className="w-20 bg-white border-r border-[#E6E6E6] flex flex-col items-center py-6 gap-2">
       <div className="mb-8">
-        <img src="/logo.jpeg" alt="EMBRYA" className="w-10 h-10 rounded-lg object-cover" />
+        <button 
+          onClick={handleLogoClick}
+          className="cursor-pointer hover:opacity-80 transition-opacity rounded-lg"
+          title="Go to Embryo Overview"
+        >
+          <img src="/logo.jpeg" alt="EMBRYA Logo - Click to go home" className="w-10 h-10 rounded-lg object-cover" />
+        </button>
       </div>
 
       {sections.map((section) => {

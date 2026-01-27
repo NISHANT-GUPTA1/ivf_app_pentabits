@@ -1,16 +1,15 @@
-# Embryo Viability Analysis Platform(Embrya)
+# 🧬 Embryo Viability Analysis Platform
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-BADGE-ID/deploy-status)](https://app.netlify.com/sites/YOUR-SITE-NAME/deploys)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> AI-powered embryo morphological analysis and viability scoring platform for IVF clinics and embryologists.
+> Embryo morphological analysis and viability scoring platform for IVF clinics and embryologists.
 
 [Live Demo](https://your-site.netlify.app) | [Report Bug](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues) | [Request Feature](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues)
 
-![Embrya](./images/logo.jpeg)
 ---
 
-## Table of Contents
+## 📋 Table of Contents
 
 - [Overview](#overview)
 - [The Problem We Solve](#the-problem-we-solve)
@@ -27,13 +26,13 @@
 
 ---
 
-## Overview
+## 🎯 Overview
 
-The **Embryo Viability Analysis Platform** is a cutting-edge web application that combines artificial intelligence with embryology to provide real-time, objective assessment of embryo quality. Our platform empowers IVF clinics to make data-driven decisions for embryo transfer, improving success rates and patient outcomes.
+The **Embryo Viability Analysis Platform** is a cutting-edge web application that combines advanced modeling with embryology to provide real-time, objective assessment of embryo quality. Our platform empowers IVF clinics to make data-driven decisions for embryo transfer, improving success rates and patient outcomes.
 
-### Primary Features
+### What Makes Us Different
 
-- **Real-time AI Processing**: Upload embryo images and receive instant viability scores
+- **Real-time Processing**: Upload embryo images and receive instant viability scores
 - **Ensemble Model Approach**: 3 trained ML models working together for robust predictions
 - **Comprehensive Dashboard**: Multi-view analytics including trends, rankings, and morphological deep-dives
 - **Clinical-Grade UI**: Designed specifically for embryologists and IVF specialists
@@ -41,7 +40,7 @@ The **Embryo Viability Analysis Platform** is a cutting-edge web application tha
 
 ---
 
-##  The Problem We Solve
+## 🔬 The Problem We Solve
 
 ### Current Challenges in IVF
 
@@ -54,16 +53,16 @@ The **Embryo Viability Analysis Platform** is a cutting-edge web application tha
 
 Our platform addresses these challenges by:
 
-- **Standardizing Assessment**: AI models trained on thousands of embryo outcomes provide consistent, objective scoring
+- **Standardizing Assessment**: Models trained on thousands of embryo outcomes provide consistent, objective scoring
 - **Accelerating Workflow**: Batch processing and automated feature extraction reduce analysis time by 80%
 - **Improving Predictions**: Ensemble learning combining multiple models achieves higher predictive accuracy
 - **Centralizing Data**: Single dashboard for all embryo data, trends, and comparative analysis
 
 ---
 
-## Key Features
+## ✨ Key Features
 
-### **1. Cycle Overview Dashboard**
+### 🎨 **1. Cycle Overview Dashboard**
 ![Dashboard Overview](./images/image.png)
 
 - Real-time visualization of all embryos in the current cycle
@@ -72,11 +71,11 @@ Our platform addresses these challenges by:
 - Summary cards with key performance indicators
 - Ranking system for transfer prioritization
 
-###  **2. Assessment Hub (AI Processing)**
+### 🧪 **2. Assessment Hub (Automated Processing)**
 ![Assessment Hub](./localhost_3001_.png)
 
 - **Drag-and-drop image upload** with live preview
-- **Real-time AI analysis** with processing status overlay
+- **Real-time analysis** with processing status overlay
 - **Instant results** showing:
   - Viability score (0-100%)
   - Confidence level (high/medium/low)
@@ -85,14 +84,14 @@ Our platform addresses these challenges by:
 - **Batch processing** capability for multiple embryos
 - **One-click report generation** (TXT format with full analysis)
 
-###  **3. Development Journey**
+### 📊 **3. Development Journey**
 
 - Timeline-based visualization of embryo progression
 - Day-by-day morphological tracking
 - Cell division milestones
 - Time-lapse integration ready
 
-###  **4. Morphology Deep Dive**
+### 🔬 **4. Morphology Deep Dive**
 
 - **Detailed cellular analysis**:
   - Inner Cell Mass (ICM) grading
@@ -103,21 +102,21 @@ Our platform addresses these challenges by:
 - **Cell uniformity metrics**
 - **Comparative morphology** across embryos
 
-###  **5. Viability Insights**
+### 📈 **5. Viability Insights**
 
 - Predictive analytics for implantation potential
 - Success probability estimation
 - Risk factor identification
 - Historical outcome correlation
 
-###  **6. Embryo Comparison**
+### 🔄 **6. Embryo Comparison**
 
 - Side-by-side comparison of up to 4 embryos
 - Feature-by-feature analysis grid
 - Visual similarity detection
 - Transfer decision support
 
-###  **7. Report Generation**
+### 📄 **7. Report Generation**
 
 - Comprehensive PDF/TXT reports
 - Include all analysis data, images, and recommendations
@@ -126,7 +125,7 @@ Our platform addresses these challenges by:
 
 ---
 
-##  Architecture
+## 🏗️ Architecture
 
 ### System Overview
 
@@ -233,7 +232,7 @@ Our platform addresses these challenges by:
 
 ---
 
-## Screenshots
+## 📸 Screenshots
 
 ### 1. Dashboard Overview
 ![Dashboard](./images/image.png)
@@ -256,7 +255,7 @@ Our platform addresses these challenges by:
 
 ---
 
-##  Technology Stack
+## 🛠️ Technology Stack
 
 ### Frontend
 - **Framework**: [React 18.3](https://react.dev/) with TypeScript
@@ -288,7 +287,7 @@ Our platform addresses these challenges by:
 
 ---
 
-##  Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -366,7 +365,7 @@ For production (Netlify):
 
 ---
 
-##  Project Structure
+## 📁 Project Structure
 
 ```
 ivf_app_pentabits/
@@ -416,7 +415,7 @@ ivf_app_pentabits/
 
 ---
 
-##  API Documentation
+## 🔌 API Documentation
 
 ### Base URL
 - **Development**: `http://localhost:8000`
@@ -486,7 +485,7 @@ Health check endpoint.
 
 ---
 
-##  Deployment
+## 🌐 Deployment
 
 ### Frontend (Netlify)
 
@@ -549,7 +548,7 @@ git subtree push --prefix backend heroku main
 
 ---
 
-##  Contributing
+## 🤝 Contributing
 
 We welcome contributions! Please follow these steps:
 
@@ -577,21 +576,29 @@ We welcome contributions! Please follow these steps:
 
 ---
 
-##  License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-##  Contact & Support
+## 🙏 Acknowledgments
 
-- **Project Maintainer**: [Ronit Jaiswal](https://github.com/Ronitjaiswal30) , [Akaksha Singh](https://github.com/akaksingh) , [Nishant gupta](https.//github.com/nishant_gupta1) , [Deepali Talreja](https.//github.com/deepalitalreja02) , [Harsh Verma](https.//github.com/GHSTFR3AK)
+- **Figma Design**: Original design inspiration from [Embryo Viability Analysis Figma](https://www.figma.com/design/fKbup00EpADWClMQoH3XXK/Embryo-Viability-Analysis)
+- **ML Training Data**: Anonymized embryo images from partner IVF clinics
+- **UI Components**: Built on [Radix UI](https://www.radix-ui.com/) and [Shadcn/ui](https://ui.shadcn.com/)
+
+---
+
+## 📧 Contact & Support
+
+- **Project Maintainer**: [Ronit Jaiswal](https://github.com/Ronitjaiswal30)
 - **Issues**: [GitHub Issues](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues)
 - **Email**: ronitjaiswal@example.com
 
 ---
 
-## Roadmap
+## 🔮 Roadmap
 
 - [ ] Deploy backend to Railway/AWS
 - [ ] Add user authentication (OAuth 2.0)
@@ -606,7 +613,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-##  Disclaimer
+## ⚠️ Disclaimer
 
 This software is intended for research and clinical decision support only. It should not be used as the sole basis for clinical decisions. All embryo transfer decisions should be made by qualified embryologists and reproductive endocrinologists in consultation with patients.
 

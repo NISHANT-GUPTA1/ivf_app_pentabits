@@ -19,7 +19,7 @@ export default {
             pink: '#F3B7C4',
           },
           blush: {
-            DEFAULT: '#FDF6F8',
+            DEFAULT: '#F8DDE5',
           },
           lavender: {
             DEFAULT: '#D8C6E0',

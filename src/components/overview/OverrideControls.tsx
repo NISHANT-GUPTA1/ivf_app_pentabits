@@ -32,9 +32,9 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
             <div className="flex items-start gap-4 mb-2">
                 <AlertCircle className="size-6 text-amber-500 flex-shrink-0" />
                 <div>
-                        <h3 className="text-lg font-semibold text-charcoal">Embryologist Override Controls</h3>
-                        <p className="text-sm text-charcoal/60">
-                        Professional assessment takes precedence over AI scoring. All overrides are logged for quality assurance.
+                    <h3 className="text-lg font-semibold text-charcoal">Embryologist Override Controls</h3>
+                    <p className="text-sm text-charcoal/60">
+                        Professional assessment takes precedence over system scoring. All overrides are logged for quality assurance.
                     </p>
                 </div>
             </div>
@@ -42,7 +42,7 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
             {/* Current Score Bar */}
                 <div className="bg-blush p-4 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-charcoal">Current AI Score</span>
+                        <span className="font-medium text-charcoal">Current Score</span>
                         <span className="text-2xl font-bold text-teal-medical">{embryo.viabilityScore}</span>
                 </div>
                     <div className="h-2 bg-[#E6E6E6] rounded-full overflow-hidden">

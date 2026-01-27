@@ -74,9 +74,9 @@ export function EmbryoViewer({ embryo, onSelectEmbryo, allEmbryos }: EmbryoViewe
           </div>
         </div>
 
-        {/* AI Analysis indicators */}
+        {/* Analysis indicators */}
         <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
-          <p className="text-gray-300 text-xs mb-1">AI Analysis Complete</p>
+          <p className="text-gray-300 text-xs mb-1">Analysis Complete</p>
           <div className="flex gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse delay-100"></div>
