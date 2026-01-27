@@ -71,7 +71,7 @@ Our platform addresses these challenges by:
 - Summary cards with key performance indicators
 - Ranking system for transfer prioritization
 
-### 🧪 **2. Assessment Hub (AI Processing)**
+###  **2. Assessment Hub (AI Processing)**
 ![Assessment Hub](./localhost_3001_.png)
 
 - **Drag-and-drop image upload** with live preview
@@ -84,14 +84,14 @@ Our platform addresses these challenges by:
 - **Batch processing** capability for multiple embryos
 - **One-click report generation** (TXT format with full analysis)
 
-### 📊 **3. Development Journey**
+###  **3. Development Journey**
 
 - Timeline-based visualization of embryo progression
 - Day-by-day morphological tracking
 - Cell division milestones
 - Time-lapse integration ready
 
-### 🔬 **4. Morphology Deep Dive**
+###  **4. Morphology Deep Dive**
 
 - **Detailed cellular analysis**:
   - Inner Cell Mass (ICM) grading
@@ -232,7 +232,7 @@ Our platform addresses these challenges by:
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 ### 1. Dashboard Overview
 ![Dashboard](./images/image.png)
@@ -255,7 +255,7 @@ Our platform addresses these challenges by:
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 ### Frontend
 - **Framework**: [React 18.3](https://react.dev/) with TypeScript
@@ -287,7 +287,7 @@ Our platform addresses these challenges by:
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -365,7 +365,7 @@ For production (Netlify):
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 ivf_app_pentabits/
@@ -415,7 +415,7 @@ ivf_app_pentabits/
 
 ---
 
-## 🔌 API Documentation
+##  API Documentation
 
 ### Base URL
 - **Development**: `http://localhost:8000`
@@ -485,7 +485,7 @@ Health check endpoint.
 
 ---
 
-## 🌐 Deployment
+##  Deployment
 
 ### Frontend (Netlify)
 
@@ -548,7 +548,7 @@ git subtree push --prefix backend heroku main
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! Please follow these steps:
 
@@ -576,21 +576,21 @@ We welcome contributions! Please follow these steps:
 
 ---
 
-## 📝 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 📧 Contact & Support
+##  Contact & Support
 
-- **Project Maintainer**: [Ronit Jaiswal](https://github.com/Ronitjaiswal30)
+- **Project Maintainer**: [Ronit Jaiswal](https://github.com/Ronitjaiswal30) , [Akaksha Singh](https://github.com/akaksingh) , [Nishant gupta](https.//github.com/nishant_gupta1) , [Deeplai Talreja](https.//github.com/deepalitalreja02) , [Harsh Verma](https.//github.com/verma.harsh0004)
 - **Issues**: [GitHub Issues](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues)
 - **Email**: ronitjaiswal@example.com
 
 ---
 
-## 🔮 Roadmap
+## Roadmap
 
 - [ ] Deploy backend to Railway/AWS
 - [ ] Add user authentication (OAuth 2.0)
