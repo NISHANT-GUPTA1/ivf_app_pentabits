@@ -584,7 +584,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ##  Contact & Support
 
-- **Project Maintainer**: [Ronit Jaiswal](https://github.com/Ronitjaiswal30) , [Akaksha Singh](https://github.com/akaksingh) , [Nishant gupta](https.//github.com/nishant_gupta1) , [Deeplai Talreja](https.//github.com/deepalitalreja02) , [Harsh Verma](https.//github.com/verma.harsh0004)
+- **Project Maintainer**: [Ronit Jaiswal](https://github.com/Ronitjaiswal30) , [Akaksha Singh](https://github.com/akaksingh) , [Nishant gupta](https.//github.com/nishant_gupta1) , [Deepali Talreja](https.//github.com/deepalitalreja02) , [Harsh Verma](https.//github.com/GHSTFR3AK)
 - **Issues**: [GitHub Issues](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues)
 - **Email**: ronitjaiswal@example.com
 
