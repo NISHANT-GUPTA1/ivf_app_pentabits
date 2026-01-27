@@ -3,11 +3,15 @@ import { AlertCircle, CheckCircle2, Save, X } from 'lucide-react';
 import type { EmbryoResult } from '../../types/embryo';
 
 interface OverrideControlsProps {
-    embryo: EmbryoResult;
+    embryo: EmbryoResult | null;
     onUpdateEmbryo: (updatedEmbryo: EmbryoResult) => void;
 }
 
 export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsProps) {
+    if (!embryo) {
+        return null;
+    }
+    
     const [overrideScore, setOverrideScore] = useState<number | ''>(embryo.overrideScore || '');
     const [overrideReason, setOverrideReason] = useState(embryo.overrideReason || '');
     const [manualGrade, setManualGrade] = useState(embryo.manualGrade || '');

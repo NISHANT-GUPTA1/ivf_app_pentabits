@@ -13,6 +13,22 @@ const scoringRules = [
 ];
 
 export function MorphologyDeepDive({ embryoData }: MorphologyDeepDiveProps) {
+  if (embryoData.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 max-w-md">
+          <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+          </svg>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Morphology Data</h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Upload embryo images to analyze morphological features
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
   const symmetryBreakdown = embryoData.reduce<Record<string, number>>((acc, embryo) => {
     const symmetry = embryo.features.symmetry;
     acc[symmetry] = (acc[symmetry] || 0) + 1;

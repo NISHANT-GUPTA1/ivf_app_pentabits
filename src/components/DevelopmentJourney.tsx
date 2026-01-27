@@ -13,6 +13,22 @@ const milestones = [
 ];
 
 export function DevelopmentJourney({ embryoData }: DevelopmentJourneyProps) {
+  if (embryoData.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 max-w-md">
+          <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Development Data</h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Upload embryo images to track developmental milestones
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
   const stageCounts = embryoData.reduce<Record<string, number>>((acc, embryo) => {
     const stage = embryo.features.developmentalStage || 'Unspecified';
     acc[stage] = (acc[stage] || 0) + 1;

@@ -2,12 +2,16 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { EmbryoResult } from '../../types/embryo';
 
 interface EmbryoViewerProps {
-  embryo: EmbryoResult;
+  embryo: EmbryoResult | null;
   onSelectEmbryo: (embryo: EmbryoResult) => void;
   allEmbryos: EmbryoResult[];
 }
 
 export function EmbryoViewer({ embryo, onSelectEmbryo, allEmbryos }: EmbryoViewerProps) {
+  if (!embryo || allEmbryos.length === 0) {
+    return null;
+  }
+  
   const currentIndex = allEmbryos.findIndex(e => e.id === embryo.id);
   
   const handlePrevious = () => {

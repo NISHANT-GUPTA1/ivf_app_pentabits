@@ -3,10 +3,14 @@ import type { EmbryoResult } from '../../types/embryo';
 
 interface ViabilityChartProps {
   embryoData: EmbryoResult[];
-  selectedEmbryo: EmbryoResult;
+  selectedEmbryo: EmbryoResult | null;
 }
 
 export function ViabilityChart({ embryoData, selectedEmbryo }: ViabilityChartProps) {
+  if (embryoData.length === 0) {
+    return null;
+  }
+  
   const data = embryoData.map((embryo, index) => ({
     name: `E${index + 1}`,
     score: embryo.viabilityScore,
@@ -51,7 +55,7 @@ export function ViabilityChart({ embryoData, selectedEmbryo }: ViabilityChartPro
             {data.map((entry) => (
               <Cell 
                 key={entry.id} 
-                fill={getBarColor(entry.score, entry.id === selectedEmbryo.id)}
+                fill={getBarColor(entry.score, selectedEmbryo ? entry.id === selectedEmbryo.id : false)}
               />
             ))}
           </Bar>

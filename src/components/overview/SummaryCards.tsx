@@ -6,20 +6,21 @@ interface SummaryCardsProps {
 
 export function SummaryCards({ embryoData }: SummaryCardsProps) {
   const totalEmbryos = embryoData.length;
-  const avgDay = Math.round(
+  
+  const avgDay = totalEmbryos > 0 ? Math.round(
     embryoData.reduce((sum, e) => {
       const day = e.features.developmentalStage.includes('Day 5') ? 5 : 
                   e.features.developmentalStage.includes('Day 3') ? 3 : 2;
       return sum + day;
     }, 0) / totalEmbryos
-  );
+  ) : 0;
   
-  const avgFragmentation = Math.round(
+  const avgFragmentation = totalEmbryos > 0 ? Math.round(
     embryoData.reduce((sum, e) => {
       const frag = e.features.fragmentation.match(/\d+/)?.[0];
       return sum + (frag ? parseInt(frag) : 0);
     }, 0) / totalEmbryos
-  );
+  ) : 0;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">

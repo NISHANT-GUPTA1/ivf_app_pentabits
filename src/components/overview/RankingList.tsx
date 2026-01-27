@@ -3,11 +3,15 @@ import type { EmbryoResult } from '../../types/embryo';
 
 interface RankingListProps {
   embryoData: EmbryoResult[];
-  selectedEmbryo: EmbryoResult;
+  selectedEmbryo: EmbryoResult | null;
   onSelectEmbryo: (embryo: EmbryoResult) => void;
 }
 
 export function RankingList({ embryoData, selectedEmbryo, onSelectEmbryo }: RankingListProps) {
+  if (embryoData.length === 0) {
+    return null;
+  }
+  
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-50';
     if (score >= 70) return 'text-blue-600 bg-blue-50';
@@ -31,7 +35,7 @@ export function RankingList({ embryoData, selectedEmbryo, onSelectEmbryo }: Rank
 
       <div className="space-y-3">
         {embryoData.map((embryo) => {
-          const isSelected = embryo.id === selectedEmbryo.id;
+          const isSelected = selectedEmbryo ? embryo.id === selectedEmbryo.id : false;
           const rankBadge = getRankBadge(embryo.rank);
 
           return (

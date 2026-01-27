@@ -8,8 +8,8 @@ import { DisclaimerFooter } from "./components/DisclaimerFooter";
 import { DevelopmentJourney } from "./components/DevelopmentJourney";
 import { MorphologyDeepDive } from "./components/MorphologyDeepDive";
 import { ViabilityInsights } from "./components/ViabilityInsights";
-import type { EmbryoResult } from "./types/embryo";
 import { generateMockEmbryos } from "./utils/mockAnalysis";
+import type { EmbryoResult } from "./types/embryo";
 
 type ViewMode = "overview" | "comparison";
 type ActiveSection =
@@ -21,13 +21,9 @@ type ActiveSection =
   | "comparison";
 
 export default function App() {
-  const [viewMode, setViewMode] =
-    useState<ViewMode>("overview");
-  const [activeSection, setActiveSection] =
-    useState<ActiveSection>("overview");
-  const [embryoData, setEmbryoData] = useState<EmbryoResult[]>(
-    generateMockEmbryos(),
-  );
+  const [viewMode, setViewMode] = useState<ViewMode>("overview");
+  const [activeSection, setActiveSection] = useState<ActiveSection>("overview");
+  const [embryoData, setEmbryoData] = useState<EmbryoResult[]>(() => generateMockEmbryos());
 
   const handleUpdateEmbryo = (updated: EmbryoResult) => {
     setEmbryoData((prev) =>
