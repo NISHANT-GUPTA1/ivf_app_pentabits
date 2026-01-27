@@ -6,7 +6,7 @@
 > Embryo morphological analysis and viability scoring platform for IVF clinics and embryologists.
 
 [Live Demo](https://your-site.netlify.app) | [Report Bug](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues) | [Request Feature](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues)
-
+![Embrya](./images/logo.jpeg)
 ---
 
 ## Table of Contents
@@ -30,7 +30,7 @@
 
 The **Embryo Viability Analysis Platform** is a cutting-edge web application that combines advanced modeling with embryology to provide real-time, objective assessment of embryo quality. Our platform empowers IVF clinics to make data-driven decisions for embryo transfer, improving success rates and patient outcomes.
 
-### What Makes Us Different
+### Key Features
 
 - **Real-time Processing**: Upload embryo images and receive instant viability scores
 - **Ensemble Model Approach**: 3 trained ML models working together for robust predictions
