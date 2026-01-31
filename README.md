@@ -1,11 +1,10 @@
 # 🧬 Embryo Viability Analysis Platform
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-BADGE-ID/deploy-status)](https://app.netlify.com/sites/YOUR-SITE-NAME/deploys)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > Embryo morphological analysis and viability scoring platform for IVF clinics and embryologists.
 
-[Live Demo](https://your-site.netlify.app) | [Report Bug](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues) | [Request Feature](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues)
+[Live Demo](https://tangerine-tarsier-b28c57.netlify.app/)| [Report Bug](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues) | [Request Feature](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues)
 ![Embrya](./images/logo.jpeg)
 ---
 
@@ -130,105 +129,370 @@ Our platform addresses these challenges by:
 ### System Overview
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         Frontend (React + Vite)              │
-│  ┌─────────────┐  ┌──────────────┐  ┌──────────────────┐   │
-│  │  Dashboard  │  │  Assessment  │  │   Data Views     │   │
-│  │   Overview  │  │     Hub      │  │  (6 Modules)     │   │
-│  └──────┬──────┘  └──────┬───────┘  └─────────┬────────┘   │
-│         │                │                     │            │
-│         └────────────────┴─────────────────────┘            │
-│                          │                                  │
-│                  REST API (HTTP)                            │
-└──────────────────────────┼──────────────────────────────────┘
-                           │
-┌──────────────────────────▼──────────────────────────────────┐
-│                  Backend (FastAPI + Python)                  │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │              /predict Endpoint                        │  │
-│  │  • Receives image uploads (multipart/form-data)       │  │
-│  │  • Validates and preprocesses images                  │  │
-│  │  • Orchestrates ML pipeline                           │  │
-│  └─────────────────────┬─────────────────────────────────┘  │
-│                        │                                     │
-│  ┌─────────────────────▼─────────────────────────────────┐  │
-│  │         Feature Extraction Module                     │  │
-│  │  • Grayscale conversion                               │  │
-│  │  • Mean intensity calculation                         │  │
-│  │  • Standard deviation                                 │  │
-│  │  • Circularity (shape analysis)                       │  │
-│  │  • Edge density (Canny detection)                     │  │
-│  │  • Shannon entropy                                    │  │
-│  └─────────────────────┬─────────────────────────────────┘  │
-│                        │                                     │
-│  ┌─────────────────────▼─────────────────────────────────┐  │
-│  │       Ensemble Prediction (3 Models)                  │  │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │  │
-│  │  │   Model 1   │  │   Model 2   │  │   Model 3   │   │  │
-│  │  │  (XGBoost)  │  │   (Random   │  │  (Logistic  │   │  │
-│  │  │             │  │   Forest)   │  │ Regression) │   │  │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘   │  │
-│  │           │              │                │            │  │
-│  │           └──────────────┴────────────────┘            │  │
-│  │                     Majority Vote                      │  │
-│  │              + Confidence Calculation                  │  │
-│  └─────────────────────┬─────────────────────────────────┘  │
-│                        │                                     │
-│  ┌─────────────────────▼─────────────────────────────────┐  │
-│  │              Response Formatting                      │  │
-│  │  • Viability score (0-100%)                           │  │
-│  │  • Prediction class (good/poor)                       │  │
-│  │  • Confidence level (high/medium/low)                 │  │
-│  │  • Feature vector (6D)                                │  │
-│  │  • Processing metadata                                │  │
-│  └───────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-              JSON Response to Frontend
+┌──────────────────────────────────────────┐
+│        Embryologist/User                 │
+│          React Web Dashboard             │
+│   (TypeScript + Tailwind CSS UI)         │
+└───────────────────────┬──────────────────┘
+                        │
+                        │ HTTP REST Requests
+                        │ (Image + Metadata)
+                        ▼
+┌──────────────────────────────────────────┐
+│            Backend API Layer             │
+│        FastAPI 0.115.0 (Python)          │
+│                                          │
+│  • Request validation (Pydantic)         │
+│  • Image ingestion                       │
+│  • Feature extraction orchestration      │
+│  • Model selection / ensemble logic      │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│   Image Processing & Feature Extraction  │
+│                                          │
+│  OpenCV + Pillow + NumPy                 │
+│  • Image decoding & resizing             │
+│  • Grayscale conversion                  │
+│  • Edge detection (Canny)                │
+│  • Gradient analysis (Sobel)             │
+│  • Morphological contour extraction      │
+│  • Statistical feature computation       │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│        Feature Scaling Layer             │
+│                                          │
+│  StandardScaler (scikit-learn)           │
+│  • Feature normalization                 │
+│  • Training-inference consistency        │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│         ML Inference Layer               │
+│                                          │
+│  RandomForest Ensemble (3 Models)        │
+│  • SMOTE-balanced training               │
+│  • Probability prediction                │
+│  • Feature importance extraction         │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│         Response Aggregation Layer       │
+│                                          │
+│  • Ensemble averaging / voting           │
+│  • Viability score (0–100)               │
+│  • Confidence computation                │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│         JSON Response to Frontend        │
+│                                          │
+│  • Viability score                       │
+│  • Classification (Good / Not Good)      │
+│  • Confidence probability                │
+│  • Ranking for batch analysis            │
+└──────────────────────────────────────────┘
+
 ```
 
 ### Data Flow
+ 
+1.**Image Upload**: User drags/drops an embryo image into the dashboard
+2.**Client-side Validation**: File type and size are validated in the browser
+3.**HTTP POST**: Image is sent as FormData to the /predict API endpoint
+4.**Backend Processing:**
+      -Image decoded and converted to NumPy array
+      -Preprocessing (resize, normalization, grayscale)
+      -Feature extraction using OpenCV
+      -Feature scaling using StandardScaler.pkl
+      -Ensemble prediction using 3 RandomForest .pkl models
+      -Viability and confidence score computation
 
-1. **Image Upload**: User drags/drops embryo image in Assessment Hub
-2. **Client-side Validation**: File type and size checks
-3. **HTTP POST**: FormData sent to `/predict` endpoint
-4. **Backend Processing**:
-   - Image decoded from base64/binary
-   - Converted to numpy array
-   - Preprocessing (resize, normalize)
-   - Feature extraction (6 features)
-   - Ensemble prediction (3 models vote)
-   - Confidence scoring
-5. **Response**: JSON with viability score, features, confidence
-6. **UI Update**: 
-   - New embryo added to state
-   - Rankings recalculated
-   - Dashboard refreshed
-   - Success notification shown
+5.**Response**: JSON response containing viability score, confidence, and features
+6.**UI Update:**
+      -Result added to application state
+      -Embryo rankings updated
 
+      
 ### ML Model Architecture
+## Model Details
 
-#### Training Pipeline
-- **Dataset**: 1,000+ annotated embryo images
-- **Labels**: Binary (good/poor) based on implantation outcomes
-- **Features Extracted**:
-  1. Mean Intensity (brightness)
-  2. Standard Deviation (texture complexity)
-  3. Circularity (shape regularity, 0-1)
-  4. Edge Density (cell boundaries)
-  5. Entropy (pattern randomness)
-  6. Future: Additional morphological features
+### Algorithm
+**Random Forest Classifier** (Scikit-learn)
 
-#### Models
-1. **XGBoost Classifier**: Gradient boosting for non-linear patterns
-2. **Random Forest**: Ensemble of decision trees for robustness
-3. **Logistic Regression**: Baseline linear model
+### Ensemble Configuration
+- **Number of Models**: 3 independent models
+  - `embryo_model_1.pkl`
+  - `embryo_model_2.pkl`
+  - `embryo_model_3.pkl`
+- **Ensemble Strategy**: Probability averaging
+  - Each model predicts independently
+  - Final probability = average of all 3 model probabilities
+  - Classification threshold: 0.5 (good if avg_probability > 0.5)
+  - Confidence level = max(probability_good, probability_not_good)
 
-#### Ensemble Strategy
-- **Voting**: Hard voting (majority wins)
-- **Confidence**: Unanimous = High, 2/3 = Medium, Split = Low
-- **Fallback**: If all models fail, return 50% viability with error flag
+### Model Hyperparameters
+```python
+RandomForestClassifier(
+    n_estimators=200,           # 200 decision trees per model
+    max_depth=10,               # Maximum tree depth
+    min_samples_split=4,        # Minimum samples to split internal node
+    min_samples_leaf=2,         # Minimum samples at leaf node
+    class_weight='balanced',    # Handle class imbalance
+    random_state=42,            # Reproducibility
+    n_jobs=-1,                  # Use all CPU cores
+    verbose=1
+)
+```
+
+---
+
+## Feature Engineering
+
+### Input Features (20 total)
+The model uses **20 engineered features** extracted from embryo images:
+
+#### Morphological Features (16 features)
+8 base features, each with mean and standard deviation:
+
+1. **std_dev** (mean, std): Standard deviation of pixel intensities - fragmentation indicator
+2. **mean_intensity** (mean, std): Average pixel brightness
+3. **contrast** (mean, std): Difference between max and min pixel intensity
+4. **entropy** (mean, std): Shannon entropy of intensity histogram - texture uniformity measure
+5. **edge_density** (mean, std): Proportion of edge pixels detected via Canny edge detection
+6. **gradient_magnitude** (mean, std): Average Sobel gradient magnitude - boundary sharpness
+7. **circularity** (mean, std): Shape regularity metric (4π × area / perimeter²)
+8. **num_regions** (mean, std): Count of connected components - cell fragmentation
+
+#### Temporal Features (4 features)
+For static images, these are set to default values:
+- **frame_number**: Frame index in time-lapse sequence (0 for static images)
+- **time_elapsed**: Time since start (0 for static images)
+- **frames_analyzed**: Number of frames processed (1 for static images)
+- **total_duration**: Total video duration (0 for static images)
+
+### Feature Extraction Pipeline
+```
+Raw Image (JPG/PNG/TIFF)
+    ↓
+Resize to 128×128 (BILINEAR interpolation)
+    ↓
+Convert to RGB (if needed)
+    ↓
+Convert to Grayscale (for feature extraction)
+    ↓
+Extract 8 morphological features using OpenCV
+    ↓
+Compute mean & std for each feature
+    ↓
+Add 4 temporal features
+    ↓
+Result: 20-dimensional feature vector
+```
+
+---
+
+## Training Pipeline
+
+### Dataset
+- **Source**: Human embryo time-lapse image sequences (F-45 focal plane)
+- **Size**: 211,248 images from 704 embryos
+- **Labels**: Binary classification
+  - **Class 0 (Not Good)**: 229 embryos (32.5%)
+  - **Class 1 (Good)**: 475 embryos (67.5%)
+- **Labeling Criteria**: Based on developmental progression milestones
+  - Good: ≥12 developmental stages with t8, OR ≥10 stages with both t4 and t8
+  - Not Good: <10 stages or missing critical milestones
+
+### Preprocessing Steps
+1. **Feature Scaling**: StandardScaler normalization (fit on training set)
+2. **Class Balancing**: SMOTE (Synthetic Minority Over-sampling Technique)
+   - Balances class distribution in training set
+   - k_neighbors=3 for SMOTE
+3. **Train-Test Split**: 80% train / 20% test (stratified)
+
+### Training Configuration
+```python
+# Data Split
+train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# Feature Scaling
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# SMOTE for Class Balance
+smote = SMOTE(random_state=42, k_neighbors=3)
+X_train_balanced, y_train_balanced = smote.fit_resample(X_train_scaled, y_train)
+
+# Model Training
+model.fit(X_train_balanced, y_train_balanced)
+```
+
+---
+
+## Model Performance
+
+### Expected Metrics
+- **Accuracy**: 85-90%
+- **Precision**: High precision for "Good" class
+- **Recall**: Balanced recall for both classes
+- **AUC-ROC**: >0.85
+- **F1-Score**: >0.80
+
+### Evaluation Metrics Tracked
+- Confusion Matrix
+- Classification Report (per-class metrics)
+- ROC-AUC Score
+- Feature Importance Rankings
+
+---
+
+## Inference Pipeline
+
+### Backend API Flow
+```
+1. Client uploads embryo image (multipart/form-data)
+        ↓
+2. FastAPI receives image bytes
+        ↓
+3. Image preprocessing (resize, convert to array)
+        ↓
+4. Feature extraction (20 features)
+        ↓
+5. Load 3 trained models (.pkl files)
+        ↓
+6. Each model predicts:
+   - Class (0 or 1)
+   - Probability [prob_not_good, prob_good]
+        ↓
+7. Ensemble prediction:
+   - Average probabilities across 3 models
+   - Final class = argmax(avg_probabilities)
+   - Confidence = max(avg_probabilities)
+        ↓
+8. Format response:
+   {
+     "viability_score": int(0-100),  # probability_good × 100
+     "prediction": "good" | "poor",
+     "confidence_level": "high" | "medium" | "low",
+     "model_predictions": [...],     # Individual model outputs
+     "features": {...}               # Extracted features
+   }
+        ↓
+9. Return JSON response to client
+```
+
+### Confidence Level Determination
+```python
+confidence = max(probability_good, probability_not_good)
+
+if confidence >= 0.80:
+    confidence_level = "high"
+elif confidence >= 0.60:
+    confidence_level = "medium"
+else:
+    confidence_level = "low"
+```
+
+---
+
+## Technology Stack
+
+
+
+### Frontend
+- **Framework**: [React 18.3](https://react.dev/) with TypeScript
+- **Build Tool**: [Vite 6.3](https://vitejs.dev/) for lightning-fast HMR
+- **UI Library**: [Radix UI](https://www.radix-ui.com/) primitives
+- **Styling**: [Tailwind CSS 3.4](https://tailwindcss.com/)
+- **Charts**: [Recharts 2.15](https://recharts.org/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **State Management**: React Hooks (useState, useEffect)
+
+### Backend
+- **Framework**: [FastAPI 0.115](https://fastapi.tiangolo.com/)
+- **ML Framework**: [scikit-learn 1.6](https://scikit-learn.org/)
+- **Image Processing**: [OpenCV 4.10](https://opencv.org/), [Pillow 11.0](https://pillow.readthedocs.io/)
+- **Data Processing**: [NumPy 2.2](https://numpy.org/)
+- **Server**: [Uvicorn](https://www.uvicorn.org/) ASGI server
+
+### Core ML Libraries
+- **scikit-learn 1.6.1**: RandomForestClassifier, StandardScaler, train_test_split, metrics
+- **imbalanced-learn**: SMOTE for class balancing
+- **joblib 1.4.2**: Model serialization (.pkl files)
+
+### Image Processing
+- **OpenCV 4.10**: Image manipulation, edge detection (Canny), gradient calculation (Sobel), contour detection
+- **Pillow 10.4.0**: Image I/O, format conversion, resizing
+- **NumPy 1.26.4**: Array operations, statistical calculations
+
+### DevOps & Deployment
+- **Hosting**: [Netlify](https://www.netlify.com/) (Frontend)
+- **Backend Hosting**: Ready for AWS Lambda, Google Cloud Run, or Railway
+- **CI/CD**: Git-based auto-deploy
+- **Version Control**: Git + GitHub
+
+---
+
+## Model Files
+
+### Stored Artifacts
+```
+Complete_training_pipeline/
+├── embryo_model_1.pkl          # Trained RandomForest model #1
+├── embryo_model_2.pkl          # Trained RandomForest model #2
+├── embryo_model_3.pkl          # Trained RandomForest model #3
+├── scaler_F-45.pkl             # StandardScaler (optional)
+├── feature_names_F-45.json     # Feature name list
+└── results_F-45.json           # Training metrics
+```
+
+### Model Loading (Backend)
+```python
+models = {}
+for i in range(1, 4):
+    model_path = f"../Complete_training_pipeline/embryo_model_{i}.pkl"
+    models[f"model_{i}"] = joblib.load(model_path)
+```
+
+---
+
+## Advantages of This Architecture
+
+1. **Ensemble Robustness**: 3 independent models reduce variance and improve generalization
+2. **Balanced Training**: SMOTE handles class imbalance effectively
+3. **Interpretability**: Random Forest provides feature importance rankings
+4. **Fast Inference**: <100ms prediction time for real-time analysis
+5. **Scalability**: Models can be retrained independently
+6. **Production-Ready**: Serialized .pkl files for easy deployment
+
+---
+
+## Future Enhancements
+
+- [ ] Explore deep learning models (CNNs for raw image input)
+- [ ] Add XGBoost and Logistic Regression to ensemble
+- [ ] Implement cross-validation for hyperparameter tuning
+- [ ] Train on larger datasets (>10,00000 embryos)
+- [ ] Incorporate time-lapse video features (temporal dynamics)
+- [ ] Add explainability (SHAP values, LIME)
+- [ ] Model versioning and A/B testing framework
+
+---
+
+## References
+
+- **Dataset**: Human embryo time-lapse imaging (F-45 focal plane)
+- **Training Notebook**: `Complete_training_pipeline/Copy_of_embryo_classifier_F_45_COMPLETE.ipynb`
+- **Backend Implementation**: `backend/main.py`
+- **Algorithm**: Breiman, L. (2001). "Random Forests". Machine Learning. 45(1): 5–32.
 
 ---
 
@@ -253,39 +517,6 @@ Our platform addresses these challenges by:
 
 ### 5. Comparison View
 ![Comparison](./images/comparison.jpeg)
----
-
-## 🛠️ Technology Stack
-
-### Frontend
-- **Framework**: [React 18.3](https://react.dev/) with TypeScript
-- **Build Tool**: [Vite 6.3](https://vitejs.dev/) for lightning-fast HMR
-- **UI Library**: [Radix UI](https://www.radix-ui.com/) primitives
-- **Styling**: [Tailwind CSS 3.4](https://tailwindcss.com/)
-- **Charts**: [Recharts 2.15](https://recharts.org/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **State Management**: React Hooks (useState, useEffect)
-
-### Backend
-- **Framework**: [FastAPI 0.115](https://fastapi.tiangolo.com/)
-- **ML Framework**: [scikit-learn 1.6](https://scikit-learn.org/)
-- **Image Processing**: [OpenCV 4.10](https://opencv.org/), [Pillow 11.0](https://pillow.readthedocs.io/)
-- **Data Processing**: [NumPy 2.2](https://numpy.org/)
-- **Server**: [Uvicorn](https://www.uvicorn.org/) ASGI server
-
-### Machine Learning
-- **XGBoost**: Gradient boosting for classification
-- **Random Forest**: Ensemble decision tree classifier
-- **Logistic Regression**: Linear baseline model
-- **Models**: 3 pre-trained `.pkl` files (ensemble)
-
-### DevOps & Deployment
-- **Hosting**: [Netlify](https://www.netlify.com/) (Frontend)
-- **Backend Hosting**: Ready for AWS Lambda, Google Cloud Run, or Railway
-- **CI/CD**: Git-based auto-deploy
-- **Version Control**: Git + GitHub
-
----
 
 ## Getting Started
 

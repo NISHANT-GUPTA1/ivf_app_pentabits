@@ -1,0 +1,4 @@
+Timestamp,User ID,Username,Role,Action,Patient Code,Cycle ID,Embryo ID,Details
+2026-01-31T09:51:13.266986,1,admin,Admin,CYCLE_CREATED,PAT001,CYCLE001,,
+2026-01-31T09:49:50.606286,1,admin,Admin,PATIENT_CREATED,PAT001,,,
+2026-01-31T09:48:18.438016,1,admin,Admin,LOGIN,,,,{'event_type': 'login'}

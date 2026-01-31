@@ -1,194 +1,187 @@
-# Embryo Viability Analysis - Backend API with Clinical Explainability
+# IVF AI Audit Trail System - Backend
 
-FastAPI backend for ensemble prediction using 3 trained models with comprehensive clinical analysis and explainability features.
+This backend provides a comprehensive audit trail system for a clinical IVF AI application with secure authentication, role-based access control, and detailed logging capabilities.
 
-## 🚀 Features
+## Features
 
-- **Ensemble Prediction**: Uses 3 RandomForest models trained on different datasets
-- **Morphological Feature Extraction**: Extracts 20 key features from embryo images
-- **Clinical Grading Systems**:
-  - Gardner blastocyst grading (expansion, ICM, TE)
-  - Morphological analysis (fragmentation, circularity, symmetry)
-  - Morphokinetics assessment (developmental timing)
-- **Genetic Risk Assessment**: Chromosomal risk indicators and PGT-A recommendations
-- **Clinical Recommendations**: Transfer/freeze/discard guidance with priority ranking
-- **Explainability**: Feature importance, decision factors, and confidence scoring
-- **Quality Metrics**: Model agreement rate, confusion matrix, performance metrics
-- **Abnormality Detection**: Automatic flagging of concerning morphology
-- **RESTful API**: FastAPI with automatic OpenAPI documentation
-- **CORS Enabled**: Works seamlessly with frontend on different port
+### Security & Authentication
+- JWT-based authentication
+- Role-based access control (Admin, Embryologist, Auditor)
+- Secure password hashing
+- Session management with login/logout tracking
 
-## 📋 Clinical Parameters Analyzed
+### Patient Tracking
+- Anonymized patient audit codes
+- Multiple IVF cycles per patient
+- Unique cycle and embryo identifiers
+- No personally identifiable information in audit logs
 
-### Morphological Analysis
-1. **Fragmentation** - Level and percentage
-2. **Circularity** - Cell shape regularity (0-1 score)
-3. **Cell Symmetry** - Blastomere uniformity
-4. **Boundary Definition** - Edge clarity and sharpness
-5. **Zona Pellucida** - Thickness and integrity
-6. **Cytoplasmic Granularity** - Texture quality
-7. **Vacuolization** - Presence of fluid-filled spaces
+### Audit Logging
+- Comprehensive logging of all user actions
+- AI prediction events with model versions and confidence scores
+- Risk indicators and abnormal morphology flags
+- AI suggestion overrides with required reasons
+- Immutable audit trail with timestamps
 
-### Blastocyst Grading (Gardner System)
-- Expansion stage (1-6)
-- Inner Cell Mass grade (A, B, C)
-- Trophectoderm grade (A, B, C)
-- Overall grade (e.g., "4AA", "5BB")
+### Audit Features
+- Read-only audit dashboard for auditors
+- Advanced filtering by patient code, cycle ID, date range
+- CSV and PDF export capabilities
+- Full traceability of embryo analysis decisions
 
-### Genetic Risk Indicators
-- Chromosomal risk level (Low/Medium/High)
-- Aneuploidy risk score (0-100)
-- PGT-A recommendation
-- Risk factors identified
+## Installation
 
-### Clinical Recommendations
-- Transfer recommendation (immediate/caution/freeze/discard)
-- Transfer priority (1-5 ranking)
-- Freeze/discard recommendations
-- Detailed reasoning and clinical notes
-
-## 🔬 Setup
-
-1. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Run Server**:
-   ```bash
-   cd backend
-   uvicorn main:app --reload --port 8000
-   ```
-
-   Or with Python module:
-   ```bash
-   python -m uvicorn main:app --reload --port 8000
-   ```
-
-## 📡 API Endpoints
-
-### `GET /`
-Health check endpoint
-```json
-{
-  "status": "ok",
-  "models_loaded": 3,
-  "message": "Embryo Viability Analysis API"
-}
+1. Install dependencies:
+```bash
+pip install -r requirements.txt
 ```
 
-### `GET /health`
-Detailed health status
-```json
-{
-  "status": "ok",
-  "models": ["model_1", "model_2", "model_3"]
-}
+2. Initialize the database:
+```bash
+python init_db.py
 ```
+
+3. Start the server:
+```bash
+python main.py
+```
+
+## Default Users
+
+The system comes with three default users (change passwords in production):
+
+- **Admin**: username: `admin`, password: `admin123`
+- **Embryologist**: username: `embryologist1`, password: `embryo123`
+- **Auditor**: username: `auditor1`, password: `audit123`
+
+## API Endpoints
+
+### Authentication
+- `POST /auth/login` - User login
+- `POST /auth/register` - Register new user (Admin only)
+
+### Patient Management
+- `POST /patients` - Create patient (Embryologist+)
+- `POST /cycles` - Create IVF cycle (Embryologist+)
+- `POST /embryos` - Create embryo (Embryologist+)
+
+### AI Prediction
+- `POST /predict` - Analyze embryo viability (Embryologist+)
+
+### Notes & Overrides
+- `POST /notes` - Add notes (Embryologist+)
+- `POST /ai-override` - Log AI override with reason (Embryologist+)
+
+### Audit Trail
+- `GET /audit-logs` - View audit logs with filtering (Auditor+)
+- `GET /export/csv` - Export audit logs as CSV (Auditor+)
+- `GET /export/pdf` - Export audit logs as PDF (Auditor+)
+
+## Usage Examples
+
+### Login
+```bash
+curl -X POST "http://localhost:8000/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"username": "embryologist1", "password": "embryo123"}'
+```
+
+### Create Patient
+```bash
+curl -X POST "http://localhost:8000/patients" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"audit_code": "PAT001"}'
+```
+
+### AI Prediction
+```bash
+curl -X POST "http://localhost:8000/predict" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "file=@embryo_image.jpg" \
+  -F "prediction_data={\"patient_audit_code\": \"PAT001\", \"cycle_id\": \"CYCLE001\", \"embryo_id\": \"EMB001\"}"
+```
+
+### View Audit Logs
+```bash
+curl -X GET "http://localhost:8000/audit-logs?patient_audit_code=PAT001" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+## Security Considerations
+
+- Change default passwords immediately
+- Use HTTPS in production
+- Implement proper session timeouts
+- Regular security audits
+- Backup audit logs regularly
+- Monitor for unauthorized access attempts
+
+## Database Schema
+
+The system uses SQLAlchemy with SQLite (easily configurable for PostgreSQL):
+
+- `users` - User accounts and roles
+- `patients` - Anonymized patient records
+- `cycles` - IVF cycle information
+- `embryos` - Embryo records
+- `audit_logs` - All audit events
+- `notes` - User notes and comments
+
+## Compliance
+
+This system is designed to help maintain compliance with:
+- HIPAA (Health Insurance Portability and Accountability Act)
+- GDPR (General Data Protection Regulation)
+- Clinical trial data integrity requirements
+- Medical device regulatory requirements
 
 ### `POST /predict`
-Comprehensive embryo viability prediction with clinical explainability
+Predict embryo viability from image
 
-**Request**: Multipart form-data with `file` field containing embryo image
+**Request**: Multipart form-data with `file` field containing image
 
-**Response** (abbreviated - see full schema below):
+**Response**:
 ```json
 {
   "prediction": "good",
   "viability_score": 82.5,
   "confidence": 0.85,
   "confidence_level": "high",
-  "model_predictions": [...],
-  "features": {...},
-  
-  "morphological_analysis": {
-    "fragmentation_level": "Moderate (10-25%)",
-    "fragmentation_percentage": 12.5,
-    "circularity_score": 0.873,
-    "circularity_grade": "Excellent",
-    "cell_symmetry": "Good - Adequate symmetry",
-    "boundary_definition": "Sharp - Well-defined boundaries",
-    "zona_pellucida_thickness": 15.2,
-    "zona_pellucida_integrity": "Intact - Normal appearance",
-    "cytoplasmic_granularity": "Minimal - Smooth cytoplasm",
-    "vacuolization": "None - No vacuoles detected"
-  },
-  
-  "blastocyst_grading": {
-    "expansion_stage": 4,
-    "expansion_description": "Expanded blastocyst",
-    "inner_cell_mass_grade": "A",
-    "trophectoderm_grade": "A",
-    "overall_grade": "4AA",
-    "quality_assessment": "Excellent - Top quality blastocyst"
-  },
-  
-  "morphokinetics": {
-    "estimated_developmental_stage": "Expanded Blastocyst (Day 5-6)",
-    "timing_assessment": "Optimal - Expected developmental timing",
-    "predicted_day": 5
-  },
-  
-  "genetic_risk": {
-    "chromosomal_risk_level": "Low",
-    "aneuploidy_risk_score": 18.5,
-    "pgt_a_recommendation": "Optional - Low risk profile",
-    "risk_factors": ["No significant risk factors identified"]
-  },
-  
-  "clinical_recommendation": {
-    "transfer_recommendation": "Transfer immediately - Excellent candidate",
-    "transfer_priority": 1,
-    "freeze_recommendation": false,
-    "discard_recommendation": false,
-    "reasoning": [
-      "High viability score (82.5) with low genetic risk",
-      "Morphology: Good - Adequate symmetry",
-      "Blastocyst grade: 4AA"
-    ],
-    "clinical_notes": "Embryo shows good - adequate symmetry with moderate (10-25%). Genetic risk assessment: Low. Gardner grade: 4AA."
-  },
-  
-  "explainability": {
-    "feature_importance": {
-      "Circularity (cell shape)": 87.3,
-      "Fragmentation indicator": 85.2,
-      "Cell boundary definition": 75.0,
-      ...
+  "model_predictions": [
+    {
+      "model": "model_1",
+      "prediction": 1,
+      "probability_good": 0.83,
+      "probability_not_good": 0.17
     },
-    "top_positive_features": [
-      {"feature": "Circularity (cell shape)", "contribution": 87.3},
-      {"feature": "Fragmentation indicator", "contribution": 85.2}
-    ],
-    "top_negative_features": [],
-    "decision_factors": [
-      "✓ Excellent cell shape and symmetry",
-      "✓ Low fragmentation - uniform appearance",
-      "✓ Well-defined cell boundaries"
-    ],
-    "confidence_explanation": "High confidence (85.0%) - All 3 AI models strongly agree on this assessment"
-  },
-  
-  "quality_metrics": {
-    "agreement_rate": 1.0,
-    "prediction_consistency": "High - Models strongly agree",
-    "model_confidence_scores": [0.83, 0.85, 0.87],
-    "uncertainty_level": "Low - Very confident prediction"
-  },
-  
-  "abnormality_flags": {
-    "has_abnormalities": false,
-    "abnormality_types": ["No significant abnormalities detected"],
-    "severity": "None - Normal morphology",
-    "requires_manual_review": false
-  },
-  
-  "analysis_timestamp": "2026-01-31T10:30:45.123456",
-  "processing_time_ms": 285.42
+    {
+      "model": "model_2",
+      "prediction": 1,
+      "probability_good": 0.85,
+      "probability_not_good": 0.15
+    },
+    {
+      "model": "model_3",
+      "prediction": 1,
+      "probability_good": 0.80,
+      "probability_not_good": 0.20
+    }
+  ],
+  "features": {
+    "std_dev": 42.3,
+    "mean_intensity": 128.5,
+    "contrast": 180.2,
+    "edge_density": 0.15,
+    "entropy": 5.8,
+    "num_regions": 12.0,
+    "circularity": 0.87,
+    "gradient_magnitude": 35.6
+  }
 }
 ```
 
-## 🎯 Models
+## Models
 
 The backend loads 3 pre-trained RandomForest models from:
 ```
