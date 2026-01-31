@@ -11,3 +11,10 @@ yarn.lock
 *.env.development
 .idea
 .vscode
+init_db.py
+venv
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
