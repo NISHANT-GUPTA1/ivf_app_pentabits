@@ -1,6 +1,111 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { apiService } from '../services/api';
 import { Upload, RefreshCw, FileUp, X, Check, Brain, ChevronDown, Download, ZoomIn, RotateCcw, Plus, User, Users } from 'lucide-react';
 import type { EmbryoResult, ComprehensivePrediction, Patient } from '../types/embryo';
+
+// Helper: normalize partial backend response into ComprehensivePrediction
+function buildComprehensivePrediction(raw: any): ComprehensivePrediction {
+    const features = raw.features || {};
+
+    // Derive fragmentation percentage: prefer explicit value, else infer from num_regions or circularity
+    let fragmentation_percentage = 0;
+    if (typeof features.fragmentation_percentage === 'number') fragmentation_percentage = features.fragmentation_percentage;
+    else if (typeof features.num_regions_mean === 'number') fragmentation_percentage = Math.min(100, features.num_regions_mean * 10);
+    else if (typeof features.circularity_mean === 'number') fragmentation_percentage = Math.max(0, Math.min(100, (1 - features.circularity_mean) * 100));
+
+    const circularity_score = typeof features.circularity_mean === 'number' ? features.circularity_mean : 0.3;
+
+    const viability = typeof raw.viability_score === 'number' ? raw.viability_score : 0;
+
+    const model_confidence_scores = (raw.model_predictions || []).map((m: any) => Number(m.probability_good || 0));
+    const agreement_rate = model_confidence_scores.length > 0 ? (model_confidence_scores.reduce((a: number, b: number) => a + b, 0) / model_confidence_scores.length) : 0;
+
+    const clinicalRecommendation = (() => {
+        if (viability >= 85) return { transfer_recommendation: 'Recommended for immediate transfer', transfer_priority: 1, freeze_recommendation: false, discard_recommendation: false, reasoning: ['High viability score'], clinical_notes: '' };
+        if (viability >= 70) return { transfer_recommendation: 'Consider for transfer', transfer_priority: 2, freeze_recommendation: false, discard_recommendation: false, reasoning: ['Good viability score'], clinical_notes: '' };
+        if (viability >= 50) return { transfer_recommendation: 'Consider with caution', transfer_priority: 3, freeze_recommendation: true, discard_recommendation: false, reasoning: ['Moderate viability score'], clinical_notes: '' };
+        return { transfer_recommendation: 'Not recommended for transfer', transfer_priority: 5, freeze_recommendation: false, discard_recommendation: true, reasoning: ['Low viability score'], clinical_notes: '' };
+    })();
+
+    // Explainability: pick top features by absolute value
+    const featureEntries = Object.entries(features).map(([k, v]) => ({ feature: k, value: Number(v || 0) }));
+    featureEntries.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+    const top_positive_features = featureEntries.slice(0, 5).map(f => ({ feature: f.feature, contribution: Math.abs(f.value) }));
+    const top_negative_features: Array<{ feature: string; concern_level: number }> = [];
+
+    const comprehensive: ComprehensivePrediction = {
+        prediction: raw.prediction || (viability >= 70 ? 'good' : 'not_good'),
+        viability_score: viability,
+        confidence: Number(raw.confidence || agreement_rate || 0),
+        confidence_level: raw.confidence_level || (viability >= 80 ? 'high' : viability >= 60 ? 'medium' : 'low'),
+        model_predictions: raw.model_predictions || [],
+        features: features,
+
+        morphological_analysis: {
+            fragmentation_level: fragmentation_percentage > 60 ? 'High' : fragmentation_percentage > 30 ? 'Moderate' : 'Low',
+            fragmentation_percentage: fragmentation_percentage,
+            circularity_score: circularity_score,
+            circularity_grade: circularity_score >= 0.6 ? 'Excellent' : circularity_score >= 0.4 ? 'Good' : 'Fair',
+            boundary_definition: 'Auto-detected',
+            cell_symmetry: circularity_score >= 0.5 ? 'Good' : 'Fair',
+            zona_pellucida_thickness: Number(features.zona_pellucida_thickness || 0),
+            zona_pellucida_integrity: 'Intact',
+            cytoplasmic_granularity: 'Normal',
+            vacuolization: 'None'
+        },
+
+        blastocyst_grading: {
+            expansion_stage: Math.min(6, Math.max(1, Math.round((viability / 100) * 4) + 2)),
+            expansion_description: '',
+            inner_cell_mass_grade: viability >= 80 ? 'A' : viability >= 60 ? 'B' : 'C',
+            trophectoderm_grade: viability >= 80 ? 'A' : viability >= 60 ? 'B' : 'C',
+            overall_grade: `${Math.min(6, Math.max(1, Math.round((viability / 100) * 6)))}${viability >= 80 ? 'AA' : viability >= 60 ? 'AB' : 'BC'}`,
+            quality_assessment: ''
+        },
+
+        morphokinetics: {
+            estimated_developmental_stage: raw.morphokinetics?.estimated_developmental_stage || 'Day 5 Blastocyst',
+            timing_assessment: raw.morphokinetics?.timing_assessment || 'Normal',
+            predicted_day: raw.morphokinetics?.predicted_day || 5
+        },
+
+        genetic_risk: {
+            chromosomal_risk_level: viability >= 80 ? 'Low' : viability >= 60 ? 'Medium' : 'High',
+            aneuploidy_risk_score: Math.max(0, Math.min(100, 100 - Math.round(viability))),
+            pgt_a_recommendation: viability >= 80 ? 'Not required' : 'Consider PGT-A',
+            risk_factors: []
+        },
+
+        clinical_recommendation: clinicalRecommendation,
+
+        explainability: {
+            feature_importance: featureEntries.reduce((acc: any, f) => { acc[f.feature] = f.value; return acc; }, {}),
+            top_positive_features,
+            top_negative_features,
+            decision_factors: ['Morphology', 'Model ensemble agreement', 'Feature importance'],
+            confidence_explanation: `Average model confidence ${(agreement_rate * 100).toFixed(1)}%`
+        },
+
+        quality_metrics: {
+            agreement_rate: agreement_rate,
+            prediction_consistency: agreement_rate > 0.8 ? 'High' : agreement_rate > 0.6 ? 'Moderate' : 'Low',
+            model_confidence_scores: model_confidence_scores,
+            uncertainty_level: agreement_rate > 0.75 ? 'Low' : 'Medium'
+        },
+
+        abnormality_flags: {
+            has_abnormalities: fragmentation_percentage > 70 || (100 - (raw.viability_score || 0)) > 60,
+            abnormality_types: fragmentation_percentage > 70 ? ['High fragmentation'] : [],
+            severity: fragmentation_percentage > 80 ? 'Severe' : fragmentation_percentage > 60 ? 'Moderate' : 'Low',
+            requires_manual_review: fragmentation_percentage > 70
+        },
+
+        analysis_timestamp: raw.analysis_timestamp || new Date().toISOString(),
+        processing_time_ms: Number(raw.processing_time_ms || 0)
+    };
+
+    return comprehensive;
+}
 
 interface AssessmentHubProps {
     embryos: EmbryoResult[];
@@ -9,9 +114,10 @@ interface AssessmentHubProps {
     activePatientId: string | null;
     onAddPatient: (patient: Patient) => void;
     onSelectPatient: (patientId: string | null) => void;
+    onNavigate?: (section: string) => void;
 }
 
-export function AssessmentHub({ embryos, setEmbryos, patients, activePatientId, onAddPatient, onSelectPatient }: AssessmentHubProps) {
+export function AssessmentHub({ embryos, setEmbryos, patients, activePatientId, onAddPatient, onSelectPatient, onNavigate }: AssessmentHubProps) {
     console.log('[AssessmentHub] render start');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -184,26 +290,10 @@ Report generated by EMBRYA Platform
             const formData = new FormData();
             formData.append('file', selectedFile);
 
-            const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-            const url = `${apiBase.replace(/\/$/, '')}/predict`;
-            console.log('[handleProcess] Fetching from:', url);
-
-            console.log('[handleProcess] Calling fetch...');
-            const response = await fetch(url, {
-                method: 'POST',
-                body: formData
-            });
-            
-            console.log('[handleProcess] Fetch returned - Status:', response.status, 'StatusText:', response.statusText);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('[handleProcess] Error response text:', errorText);
-                throw new Error(`Backend error: ${response.status} - ${errorText.substring(0, 200)}`);
-            }
-
-            console.log('[handleProcess] Response OK, parsing JSON...');
-            const data = await response.json();
+            // Use apiService which handles Authorization header and prediction_data
+            console.log('[handleProcess] Calling apiService.predictEmbryo...');
+            const data = await apiService.predictEmbryo(0, selectedFile, activePatient?.audit_code || 'P001', selectedCycle, `E${Date.now()}`);
+            console.log('[handleProcess] Prediction response:', data);
             console.log('[handleProcess] JSON parsed successfully:', JSON.stringify(data, null, 2));
 
             if (data.viability_score === undefined || data.viability_score === null) {
@@ -217,7 +307,7 @@ Report generated by EMBRYA Platform
             console.log('[handleProcess] Has clinical_recommendation?', !!data.clinical_recommendation);
 
             // Map backend response to EmbryoResult with comprehensive analysis
-            const comprehensiveData: ComprehensivePrediction = data;
+            const comprehensiveData: ComprehensivePrediction = buildComprehensivePrediction(data);
             console.log('[handleProcess] comprehensiveData created:', !!comprehensiveData);
             
             const newEmbryo: EmbryoResult = {
@@ -293,6 +383,14 @@ Report generated by EMBRYA Platform
             
             // Show success message (stays visible until new upload)
             setSuccessMessage(`✓ ${newEmbryo.name} analyzed! Viability: ${newEmbryo.viabilityScore}% | Rank: #${newEmbryo.rank}`);
+            // Navigate user to Explainability dashboard for realtime view
+            if (typeof onNavigate === 'function') {
+                try {
+                    onNavigate('explainability');
+                } catch (e) {
+                    console.warn('[AssessmentHub] onNavigate failed', e);
+                }
+            }
             
             console.log('[handleProcess] === PROCESSING COMPLETE ===');
             console.log('[handleProcess] Total embryos now:', updatedEmbryos.length);

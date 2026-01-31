@@ -2,11 +2,14 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from models import User
 from database import get_db
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Security settings
 SECRET_KEY = "your-secret-key-here-change-in-production"  # In production, use environment variable
@@ -79,3 +82,47 @@ require_admin = check_role(["Admin"])
 require_embryologist = check_role(["Admin", "Embryologist"])
 require_auditor = check_role(["Admin", "Embryologist", "Auditor"])
 require_read_only = check_role(["Auditor"])  # For read-only operations
+
+
+def get_current_user_optional(request: Request, db: Session = Depends(get_db)):
+    """Return current user if Authorization header present, otherwise None."""
+    auth_header = request.headers.get("authorization")
+    if not auth_header:
+        logger.debug("No Authorization header present (anonymous request).")
+        return None
+
+    # Expect header like: "Bearer <token>"
+    parts = auth_header.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        return None
+    token = parts[1]
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    logger.debug("Authorization header found; attempting token decode.")
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            logger.debug("Token decode succeeded but no 'sub' field found.")
+            raise credentials_exception
+    except JWTError as e:
+        logger.debug(f"Token decode failed: {e}")
+        return None
+
+    user = db.query(User).filter(User.username == username).first()
+    if user is None:
+        return None
+    return user
+
+
+def get_current_active_user_optional(current_user: Optional[User] = Depends(get_current_user_optional)):
+    """Optional active user checker — returns None for anonymous requests."""
+    if current_user is None:
+        return None
+    if not current_user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user

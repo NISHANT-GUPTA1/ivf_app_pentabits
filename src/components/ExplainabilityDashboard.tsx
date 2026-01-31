@@ -15,16 +15,54 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
   const [showOverlay, setShowOverlay] = useState(true);
   const [overlayMode, setOverlayMode] = useState<'fragmentation' | 'boundaries' | 'zones' | 'all'>('all');
   
-  const { 
-    viability_score, 
-    morphological_analysis, 
-    blastocyst_grading,
-    genetic_risk,
-    clinical_recommendation,
-    explainability,
-    quality_metrics,
-    abnormality_flags
-  } = prediction;
+  // Defensive defaults so the dashboard renders even if backend omits some fields
+  const defaultMorph = {
+    fragmentation_level: 'Unknown',
+    fragmentation_percentage: 0,
+    circularity_score: 0,
+    circularity_grade: 'N/A',
+    boundary_definition: 'N/A',
+    cell_symmetry: 'Unknown',
+    zona_pellucida_thickness: 0,
+    zona_pellucida_integrity: 'Unknown',
+    cytoplasmic_granularity: 'Unknown',
+    vacuolization: 'Unknown'
+  };
+
+  const defaultBlast = {
+    expansion_stage: 0,
+    expansion_description: '',
+    inner_cell_mass_grade: 'N/A',
+    trophectoderm_grade: 'N/A',
+    overall_grade: 'N/A',
+    quality_assessment: ''
+  };
+
+  const defaultMorphok = { estimated_developmental_stage: 'Unknown', timing_assessment: '', predicted_day: 0 };
+
+  const defaultGenetic = { chromosomal_risk_level: 'Unknown', aneuploidy_risk_score: 0, pgt_a_recommendation: '', risk_factors: [] };
+
+  const defaultClinical = { transfer_recommendation: 'No recommendation', transfer_priority: 5, freeze_recommendation: false, discard_recommendation: false, reasoning: [], clinical_notes: '' };
+
+  const defaultExplain = { feature_importance: {}, top_positive_features: [], top_negative_features: [], decision_factors: [], confidence_explanation: 'N/A' };
+
+  const defaultQuality = { agreement_rate: 0, prediction_consistency: 'Unknown', model_confidence_scores: [], uncertainty_level: 'Unknown' };
+
+  const defaultAbnorm = { has_abnormalities: false, abnormality_types: [], severity: 'None', requires_manual_review: false };
+
+  const {
+    viability_score = 0,
+    morphological_analysis = defaultMorph,
+    blastocyst_grading = defaultBlast,
+    morphokinetics = defaultMorphok,
+    genetic_risk = defaultGenetic,
+    clinical_recommendation = defaultClinical,
+    explainability = defaultExplain,
+    quality_metrics = defaultQuality,
+    abnormality_flags = defaultAbnorm,
+    processing_time_ms = 0,
+    analysis_timestamp = new Date().toISOString()
+  } = prediction || {} as any;
 
   return (
     <div className="space-y-6 p-6">
@@ -37,20 +75,20 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
         <div className="flex items-center gap-4">
           <div className="text-right">
             <p className="text-sm text-gray-500">Viability Score</p>
-            <p className="text-4xl font-bold text-emerald-600">{viability_score.toFixed(1)}</p>
+              <p className="text-4xl font-bold text-emerald-600">{(viability_score ?? 0).toFixed(1)}</p>
           </div>
           <img src={imageUrl} alt={embryoName} className="w-32 h-32 rounded-lg object-cover border-2 border-gray-200" />
         </div>
       </div>
 
       {/* Abnormality Alerts */}
-      {abnormality_flags.has_abnormalities && (
-        <Alert variant={abnormality_flags.severity.includes('Severe') ? 'destructive' : 'default'}>
+      {abnormality_flags && abnormality_flags.has_abnormalities && (
+        <Alert variant={(abnormality_flags.severity || '').includes('Severe') ? 'destructive' : 'default'}>
           <AlertCircle className="h-5 w-5" />
           <AlertDescription>
             <strong>{abnormality_flags.severity}</strong>
             <ul className="mt-2 ml-4 list-disc">
-              {abnormality_flags.abnormality_types.map((abn, idx) => (
+              {(abnormality_flags.abnormality_types || []).map((abn, idx) => (
                 <li key={idx}>{abn}</li>
               ))}
             </ul>
@@ -101,14 +139,14 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
         <h2 className="text-2xl font-bold text-gray-900 mb-4">🔍 Why This Score? (Explainability)</h2>
         
         <div className="mb-4">
-          <p className="text-gray-700 mb-2"><strong>Model Confidence:</strong> {explainability.confidence_explanation}</p>
+          <p className="text-gray-700 mb-2"><strong>Model Confidence:</strong> {explainability?.confidence_explanation || 'N/A'}</p>
           <div className="flex gap-2 flex-wrap">
-            {quality_metrics.model_confidence_scores.map((score, idx) => (
-              <Badge key={idx} variant="outline">Model {idx + 1}: {(score * 100).toFixed(1)}%</Badge>
+            {(quality_metrics?.model_confidence_scores || []).map((score: number, idx: number) => (
+                <Badge key={idx} variant="outline">Model {idx + 1}: {(Number(score || 0) * 100).toFixed(1)}%</Badge>
             ))}
           </div>
           <p className="text-sm text-gray-600 mt-2">
-            Agreement Rate: <span className="font-semibold">{(quality_metrics.agreement_rate * 100).toFixed(1)}%</span> ({quality_metrics.prediction_consistency})
+            Agreement Rate: <span className="font-semibold">{((quality_metrics?.agreement_rate || 0) * 100).toFixed(1)}%</span> ({quality_metrics?.prediction_consistency || 'Unknown'})
           </p>
         </div>
 
@@ -125,6 +163,7 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
                   <li key={idx} className="flex justify-between items-center">
                     <span className="text-sm text-gray-700">{feat.feature}</span>
                     <Badge variant="default" className="bg-emerald-600">{feat.contribution.toFixed(1)}</Badge>
+                      <Badge variant="default" className="bg-emerald-600">{(feat.contribution ?? 0).toFixed(1)}</Badge>
                   </li>
                 ))}
               </ul>
@@ -143,6 +182,7 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
                   <li key={idx} className="flex justify-between items-center">
                     <span className="text-sm text-gray-700">{feat.feature}</span>
                     <Badge variant="destructive">{feat.concern_level.toFixed(1)}</Badge>
+                      <Badge variant="destructive">{(feat.concern_level ?? 0).toFixed(1)}</Badge>
                   </li>
                 ))}
               </ul>
@@ -272,7 +312,7 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
                   {(overlayMode === 'fragmentation' || overlayMode === 'all') && (
                     <>
                       {/* Simulated fragmentation regions - heat map colors (dark red to yellow) */}
-                      {Array.from({ length: Math.floor(morphological_analysis.fragmentation_percentage / 5) }).map((_, i) => {
+                      {Array.from({ length: Math.floor((morphological_analysis.fragmentation_percentage ?? 0) / 5) }).map((_, i) => {
                         const intensity = Math.random();
                         const heatColor = intensity > 0.7 ? 'rgba(139, 0, 0, 0.8)' : // Dark red (high)
                                          intensity > 0.4 ? 'rgba(220, 20, 60, 0.7)' : // Crimson (medium)
@@ -290,7 +330,7 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
                         );
                       })}
                       <text x="10" y="25" fill="#8B0000" fontSize="14" fontWeight="bold">
-                        🔴 Fragmentation: {morphological_analysis.fragmentation_percentage.toFixed(1)}%
+                        🔴 Fragmentation: {(morphological_analysis.fragmentation_percentage ?? 0).toFixed(1) + '%'}
                       </text>
                     </>
                   )}
@@ -364,8 +404,8 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
             <div className="bg-orange-50 p-3 rounded-lg">
               <p className="text-xs text-gray-600 mb-1">Detected Fragmentation</p>
               <p className="text-2xl font-bold text-orange-600">
-                {morphological_analysis.fragmentation_percentage.toFixed(1)}%
-              </p>
+                  {(morphological_analysis.fragmentation_percentage ?? 0).toFixed(1) + '%'}
+                </p>
               <p className="text-xs text-gray-500">{morphological_analysis.fragmentation_level}</p>
             </div>
 
@@ -413,7 +453,7 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
           {/* Fragmentation */}
           <div>
             <h3 className="font-semibold text-gray-700 mb-2">Fragmentation</h3>
-            <p className="text-2xl font-bold text-gray-900">{morphological_analysis.fragmentation_percentage.toFixed(1)}%</p>
+            <p className="text-2xl font-bold text-gray-900">{(morphological_analysis.fragmentation_percentage ?? 0).toFixed(1) + '%'}</p>
             <p className="text-sm text-gray-600">{morphological_analysis.fragmentation_level}</p>
           </div>
 
@@ -421,6 +461,7 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
           <div>
             <h3 className="font-semibold text-gray-700 mb-2">Circularity (Cell Shape)</h3>
             <p className="text-2xl font-bold text-gray-900">{morphological_analysis.circularity_score.toFixed(3)}</p>
+              <p className="text-2xl font-bold text-gray-900">{(morphological_analysis.circularity_score ?? 0).toFixed(3)}</p>
             <p className="text-sm text-gray-600">{morphological_analysis.circularity_grade}</p>
           </div>
 
@@ -459,6 +500,7 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
               <div className="flex justify-between text-sm mb-1">
                 <span>Circularity Score</span>
                 <span>{morphological_analysis.circularity_score.toFixed(3)}</span>
+                  <span>{(morphological_analysis.circularity_score ?? 0).toFixed(3)}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
@@ -471,6 +513,7 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
               <div className="flex justify-between text-sm mb-1">
                 <span>Quality (Inverse Fragmentation)</span>
                 <span>{(100 - morphological_analysis.fragmentation_percentage).toFixed(1)}%</span>
+                  <span>{(100 - (morphological_analysis.fragmentation_percentage ?? 0)).toFixed(1)}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
@@ -536,6 +579,7 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600 mb-1">Aneuploidy Risk Score</p>
             <p className="text-3xl font-bold text-gray-900">{genetic_risk.aneuploidy_risk_score.toFixed(1)}</p>
+              <p className="text-3xl font-bold text-gray-900">{(genetic_risk.aneuploidy_risk_score ?? 0).toFixed(1)}</p>
             <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
               <div 
                 className={`h-2 rounded-full ${genetic_risk.aneuploidy_risk_score > 50 ? 'bg-red-600' : genetic_risk.aneuploidy_risk_score > 30 ? 'bg-orange-500' : 'bg-emerald-600'}`}
@@ -562,8 +606,8 @@ export function ExplainabilityDashboard({ prediction, embryoName, imageUrl }: Ex
 
       {/* Metadata Footer */}
       <div className="text-sm text-gray-500 text-center p-4 bg-gray-50 rounded-lg">
-        <p>Analysis completed in {prediction.processing_time_ms.toFixed(0)}ms</p>
-        <p className="text-xs mt-1">{new Date(prediction.analysis_timestamp).toLocaleString()}</p>
+        <p>Analysis completed in {(processing_time_ms ?? 0).toFixed(0)}ms</p>
+        <p className="text-xs mt-1">{new Date(analysis_timestamp || new Date().toISOString()).toLocaleString()}</p>
       </div>
     </div>
   );

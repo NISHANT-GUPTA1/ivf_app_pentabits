@@ -1,12 +1,14 @@
 from sqlalchemy.orm import Session
+from typing import Optional
 from models import AuditLog, User
 from schemas import AuditLogCreate, AIPredictionLog, AIOverrideLog
 from datetime import datetime
 
-def log_user_action(db: Session, user: User, log_data: AuditLogCreate):
-    """Log a user action to the audit trail"""
+def log_user_action(db: Session, user: Optional[User], log_data: AuditLogCreate):
+    """Log a user action to the audit trail. `user` may be None for anonymous events."""
+    user_id = user.id if user else None
     audit_log = AuditLog(
-        user_id=user.id,
+        user_id=user_id,
         action=log_data.action,
         patient_audit_code=log_data.patient_audit_code,
         cycle_id=log_data.cycle_id,
@@ -18,7 +20,7 @@ def log_user_action(db: Session, user: User, log_data: AuditLogCreate):
     db.refresh(audit_log)
     return audit_log
 
-def log_ai_prediction(db: Session, user: User, ai_log: AIPredictionLog):
+def log_ai_prediction(db: Session, user: Optional[User], ai_log: AIPredictionLog):
     """Log AI prediction event"""
     details = {
         "model_version": ai_log.model_version,
@@ -36,7 +38,7 @@ def log_ai_prediction(db: Session, user: User, ai_log: AIPredictionLog):
     )
     return log_user_action(db, user, log_data)
 
-def log_ai_override(db: Session, user: User, override_log: AIOverrideLog):
+def log_ai_override(db: Session, user: Optional[User], override_log: AIOverrideLog):
     """Log AI override event"""
     details = {
         "original_prediction": override_log.original_prediction,
@@ -53,7 +55,7 @@ def log_ai_override(db: Session, user: User, override_log: AIOverrideLog):
     )
     return log_user_action(db, user, log_data)
 
-def log_login(db: Session, user: User):
+def log_login(db: Session, user: Optional[User]):
     """Log user login"""
     log_data = AuditLogCreate(
         action="LOGIN",
@@ -61,7 +63,7 @@ def log_login(db: Session, user: User):
     )
     return log_user_action(db, user, log_data)
 
-def log_logout(db: Session, user: User):
+def log_logout(db: Session, user: Optional[User]):
     """Log user logout"""
     log_data = AuditLogCreate(
         action="LOGOUT",
@@ -69,7 +71,7 @@ def log_logout(db: Session, user: User):
     )
     return log_user_action(db, user, log_data)
 
-def log_prediction_viewed(db: Session, user: User, patient_code: str, cycle_id: str, embryo_id: str):
+def log_prediction_viewed(db: Session, user: Optional[User], patient_code: str, cycle_id: str, embryo_id: str):
     """Log when AI prediction is viewed"""
     log_data = AuditLogCreate(
         action="PREDICTION_VIEWED",

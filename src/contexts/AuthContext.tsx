@@ -36,8 +36,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (storedToken) {
       setToken(storedToken);
       apiService.setToken(storedToken);
-      // In a real app, you'd validate the token here
-      setUser({ id: 1, username: 'admin', role: 'Admin', is_active: true, created_at: new Date().toISOString() });
     }
     setIsLoading(false);
   }, []);

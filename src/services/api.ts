@@ -158,11 +158,14 @@ class ApiService {
       embryo_id: embryoIdentifier,
     }));
 
+    const headers: Record<string,string> = {};
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}/predict`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.token}`,
-      },
+      headers,
       body: formData,
     });
 

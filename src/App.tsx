@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Sidebar } from "./components/Sidebar";
+import { useAuth } from './contexts/AuthContext';
+import { LoginForm } from './components/LoginForm';
 import { DashboardHeader } from "./components/DashboardHeader";
 import { CycleOverview } from "./components/CycleOverview";
 import { EmbryoComparison } from "./components/EmbryoComparison";
@@ -24,6 +26,10 @@ type ActiveSection =
   | "explainability";
 
 export default function App() {
+  // Check auth and show LoginForm when not authenticated
+  const auth = useAuth();
+  if (auth.isLoading) return <div />;
+  if (!auth.user) return <LoginForm />;
   const [viewMode, setViewMode] = useState<ViewMode>("overview");
   const [activeSection, setActiveSection] = useState<ActiveSection>("overview");
   const [allEmbryos, setAllEmbryos] = useState<EmbryoResult[]>(() => generateMockEmbryos());
@@ -74,6 +80,7 @@ export default function App() {
               activePatientId={activePatientId}
               onAddPatient={handleAddPatient}
               onSelectPatient={handleSelectPatient}
+              onNavigate={setActiveSection}
             />
           )}
 
