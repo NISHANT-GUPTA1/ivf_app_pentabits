@@ -5,10 +5,12 @@ interface SummaryCardsProps {
 }
 
 export function SummaryCards({ embryoData }: SummaryCardsProps) {
-  const totalEmbryos = embryoData.length;
+  // Exclude placeholder embryo from count
+  const realEmbryos = embryoData.filter(e => e.id !== 'placeholder-embryo');
+  const totalEmbryos = realEmbryos.length;
   
   const avgDay = totalEmbryos > 0 ? Math.round(
-    embryoData.reduce((sum, e) => {
+    realEmbryos.reduce((sum, e) => {
       const day = e.features.developmentalStage.includes('Day 5') ? 5 : 
                   e.features.developmentalStage.includes('Day 3') ? 3 : 2;
       return sum + day;
@@ -16,7 +18,7 @@ export function SummaryCards({ embryoData }: SummaryCardsProps) {
   ) : 0;
   
   const avgFragmentation = totalEmbryos > 0 ? Math.round(
-    embryoData.reduce((sum, e) => {
+    realEmbryos.reduce((sum, e) => {
       const frag = e.features.fragmentation.match(/\d+/)?.[0];
       return sum + (frag ? parseInt(frag) : 0);
     }, 0) / totalEmbryos

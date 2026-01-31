@@ -4,32 +4,39 @@ interface DevelopmentJourneyProps {
   embryoData: EmbryoResult[];
 }
 
-const milestones = [
-  { label: 'Day 0-1', detail: 'Fertilization & Pronuclei', status: 'complete' },
-  { label: 'Day 2-3', detail: 'Cleavage & Compaction', status: 'complete' },
-  { label: 'Day 4', detail: 'Morula Check', status: 'in-progress' },
-  { label: 'Day 5', detail: 'Early Blastocyst', status: 'pending' },
-  { label: 'Day 5-6', detail: 'Expanded Blastocyst', status: 'pending' },
-];
-
 export function DevelopmentJourney({ embryoData }: DevelopmentJourneyProps) {
-  if (embryoData.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="bg-white rounded-lg shadow-sm border border-[#E6E6E6] p-12 max-w-md">
-            <svg className="mx-auto h-16 w-16 text-charcoal/40 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-            <h3 className="text-lg font-medium text-charcoal mb-2">No Development Data</h3>
-            <p className="text-sm text-charcoal/60 mb-4">
-            Upload embryo images to track developmental milestones
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Filter out placeholder embryo
+  const realEmbryos = embryoData.filter(e => e.id !== 'placeholder-embryo');
   
-  const stageCounts = embryoData.reduce<Record<string, number>>((acc, embryo) => {
+  // Determine milestone status dynamically based on embryo stages
+  const stageProgression: Record<string, number> = {
+    'Zygote': 1,
+    '2-Cell': 1,
+    '4-Cell': 2,
+    '8-Cell': 2,
+    'Morula': 3,
+    'Early Blastocyst': 4,
+    'Blastocyst': 4,
+    'Day 5 Blastocyst': 5,
+    'Day 6 Blastocyst': 5,
+    'Expanded Blastocyst': 5,
+  };
+  
+  // Get the most advanced stage across all embryos (0 if no embryos)
+  const maxStageLevel = realEmbryos.reduce((max, embryo) => {
+    const level = stageProgression[embryo.features.developmentalStage] || 0;
+    return Math.max(max, level);
+  }, 0);
+  
+  const milestones = [
+    { label: 'Day 0-1', detail: 'Fertilization & Pronuclei', stage: 1, status: maxStageLevel >= 1 ? 'complete' : 'pending' },
+    { label: 'Day 2-3', detail: 'Cleavage & Compaction', stage: 2, status: maxStageLevel >= 2 ? 'complete' : maxStageLevel === 1 ? 'in-progress' : 'pending' },
+    { label: 'Day 4', detail: 'Morula Check', stage: 3, status: maxStageLevel >= 3 ? 'complete' : maxStageLevel === 2 ? 'in-progress' : 'pending' },
+    { label: 'Day 5', detail: 'Early Blastocyst', stage: 4, status: maxStageLevel >= 4 ? 'complete' : maxStageLevel === 3 ? 'in-progress' : 'pending' },
+    { label: 'Day 5-6', detail: 'Expanded Blastocyst', stage: 5, status: maxStageLevel >= 5 ? 'complete' : maxStageLevel === 4 ? 'in-progress' : 'pending' },
+  ];
+  
+  const stageCounts = realEmbryos.reduce<Record<string, number>>((acc, embryo) => {
     const stage = embryo.features.developmentalStage || 'Unspecified';
     acc[stage] = (acc[stage] || 0) + 1;
     return acc;
@@ -44,7 +51,7 @@ export function DevelopmentJourney({ embryoData }: DevelopmentJourneyProps) {
             <p className="text-charcoal/60 text-sm">Track cohort progression against expected milestones.</p>
         </div>
         <div className="bg-green-50 text-green-700 px-3 py-2 rounded-lg text-sm font-medium border border-green-100">
-          {embryoData.length} embryos monitored
+          {realEmbryos.length} embryos monitored
         </div>
       </header>
 
@@ -97,8 +104,14 @@ export function DevelopmentJourney({ embryoData }: DevelopmentJourneyProps) {
               <h3 className="text-lg font-semibold text-charcoal">Current Stage Mix</h3>
               <span className="text-xs text-charcoal/60">Live cohort</span>
           </div>
-          <div className="space-y-3">
-            {Object.entries(stageCounts).map(([stage, count]) => (
+          {realEmbryos.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-sm text-gray-500 mb-2">No embryo data yet</p>
+              <p className="text-xs text-gray-400">Upload images to track developmental stages</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {Object.entries(stageCounts).map(([stage, count]) => (
               <div key={stage} className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-teal-medical" />
                 <div className="flex-1">
@@ -113,7 +126,8 @@ export function DevelopmentJourney({ embryoData }: DevelopmentJourneyProps) {
                   <div className="text-sm font-semibold text-charcoal">{count}</div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
 
           <div className="bg-white border border-[#E6E6E6] rounded-xl p-6 shadow-sm">

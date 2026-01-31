@@ -1,6 +1,6 @@
-import { Activity, TrendingUp, Microscope, Target, GitCompare } from 'lucide-react';
+import { Activity, TrendingUp, Microscope, Target, GitCompare, Brain, Layers } from 'lucide-react';
 
-type ActiveSection = 'overview' | 'assessment' | 'development' | 'morphology' | 'viability' | 'comparison';
+type ActiveSection = 'overview' | 'assessment' | 'development' | 'morphology' | 'viability' | 'comparison' | 'explainability';
 
 interface SidebarProps {
   activeSection: ActiveSection;
@@ -11,8 +11,9 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   const sections = [
     { id: 'overview' as const, icon: Activity, label: 'Embryo Overview' },
     { id: 'assessment' as const, icon: Microscope, label: 'Assessment Hub' },
+    { id: 'explainability' as const, icon: Brain, label: 'AI Explainability' },
     { id: 'development' as const, icon: TrendingUp, label: 'Development Stage' },
-    { id: 'morphology' as const, icon: Microscope, label: 'Morphology' },
+    { id: 'morphology' as const, icon: Layers, label: 'Morphology' },
     { id: 'viability' as const, icon: Target, label: 'Viability Scores' },
     { id: 'comparison' as const, icon: GitCompare, label: 'Comparison View' },
   ];
@@ -22,7 +23,7 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   };
 
   return (
-      <div className="w-20 bg-white border-r border-[#E6E6E6] flex flex-col items-center py-6 gap-2">
+      <div className="w-20 bg-white border-r border-[#E6E6E6] flex flex-col items-center py-6 gap-2 fixed left-0 top-0 bottom-0 z-50">
       <div className="mb-8">
         <button 
           onClick={handleLogoClick}

@@ -11,3 +11,13 @@ yarn.lock
 *.env.development
 .idea
 .vscode
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.db
+*.sqlite

@@ -6,7 +6,14 @@ interface QualityMetricsChartProps {
 }
 
 export function QualityMetricsChart({ embryoData }: QualityMetricsChartProps) {
-  const data = embryoData.map((embryo, index) => {
+  // Filter out placeholder embryo
+  const realEmbryos = embryoData.filter(e => e.id !== 'placeholder-embryo');
+  const hasOnlyPlaceholder = realEmbryos.length === 0;
+  
+  // Use placeholder data if no real embryos
+  const data = hasOnlyPlaceholder ? [
+    { name: 'E1', ICM: 0, TE: 0 }
+  ] : realEmbryos.map((embryo, index) => {
     const icmScore = embryo.features.innerCellMass?.includes('A') ? 90 :
                      embryo.features.innerCellMass?.includes('B') ? 75 :
                      embryo.features.innerCellMass?.includes('C') ? 55 : 0;
@@ -20,15 +27,16 @@ export function QualityMetricsChart({ embryoData }: QualityMetricsChartProps) {
       ICM: icmScore,
       TE: teScore
     };
-  }).filter(d => d.ICM > 0 || d.TE > 0);
+  }); // Removed filter - show all real embryos
 
-  if (data.length === 0) {
+  // Only show "no data" message if there's truly no data and no placeholder
+  if (data.length === 0 && !hasOnlyPlaceholder) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h3 className="text-sm font-medium text-gray-900 mb-4">
           Inner Cell Mass & Trophectoderm Quality
         </h3>
-        <div className="h-[200px] flex items-center justify-center text-sm text-gray-500">
+        <div className="h-[260px] flex items-center justify-center text-sm text-gray-500">
           No blastocyst data available
         </div>
       </div>
@@ -41,7 +49,7 @@ export function QualityMetricsChart({ embryoData }: QualityMetricsChartProps) {
         Inner Cell Mass & Trophectoderm Quality
       </h3>
       
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={282.5}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
           <XAxis 

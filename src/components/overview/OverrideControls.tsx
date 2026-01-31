@@ -16,15 +16,27 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
     const [overrideReason, setOverrideReason] = useState(embryo.overrideReason || '');
     const [manualGrade, setManualGrade] = useState(embryo.manualGrade || '');
     const [notes, setNotes] = useState(embryo.notes || '');
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const handleSubmit = () => {
-        onUpdateEmbryo({
-            ...embryo,
-            overrideScore: typeof overrideScore === 'number' ? overrideScore : undefined,
-            overrideReason,
-            manualGrade,
-            notes
-        });
+        setIsProcessing(true);
+        
+        // Simulate processing time
+        setTimeout(() => {
+            onUpdateEmbryo({
+                ...embryo,
+                overrideScore: typeof overrideScore === 'number' ? overrideScore : undefined,
+                overrideReason,
+                manualGrade,
+                notes
+            });
+            
+            setIsProcessing(false);
+            // Show success message
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 3000);
+        }, 800);
     };
 
     return (
@@ -127,14 +139,35 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
                     <p className="text-xs text-charcoal/60 mt-1">Document specific morphological features or clinical considerations</p>
             </div>
 
+            {/* Success Message */}
+            {showSuccess && (
+                <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-lg text-sm text-emerald-700 border border-emerald-200">
+                    <CheckCircle2 className="size-4" />
+                    Override saved successfully! Changes have been applied to {embryo.name}.
+                </div>
+            )}
+
             {/* Actions */}
             <div className="pt-4 flex gap-3">
                 <button
                     onClick={handleSubmit}
-                        className="flex-1 bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                    disabled={isProcessing}
+                    className="flex-1 bg-pink-700 text-white py-2.5 rounded-lg font-medium hover:bg-pink-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                    <Save className="size-4" />
-                    Submit Override
+                    {isProcessing ? (
+                        <>
+                            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Processing...
+                        </>
+                    ) : (
+                        <>
+                            <Save className="size-4" />
+                            Submit Override
+                        </>
+                    )}
                 </button>
                 <button
                     onClick={() => {

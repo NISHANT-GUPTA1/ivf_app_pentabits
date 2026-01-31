@@ -2,44 +2,41 @@ import type { EmbryoResult, EmbryoFeatures } from '../types/embryo';
 
 // Embryo images for mock data
 const embryoImages = [
-  'https://images.unsplash.com/photo-1617178571938-7859791e1751?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaWNyb3Njb3BlJTIwZW1icnlvJTIwY2VsbHN8ZW58MXx8fHwxNzY5MzM4MDk3fDA&ixlib=rb-4.1.0&q=80&w=1080',
-  '/images/image_2.png',
-  '/images/image_3.jpeg',
-  '/images/image_4.png',
-  '/images/image_5.jpeg',
-  '/images/images_6.jpeg'
+  '/images/image_2.png', // Single placeholder image
 ];
 
 // Generate mock embryo data for the dashboard
 export function generateMockEmbryos(): EmbryoResult[] {
   const results: EmbryoResult[] = [];
-  const numEmbryos = 6;
+  const numEmbryos = 1; // Only 1 placeholder embryo
 
   for (let i = 0; i < numEmbryos; i++) {
-    const viabilityScore = generateViabilityScore(i);
-    const features = generateFeatures(viabilityScore);
-    const keyFindings = generateKeyFindings(features, viabilityScore);
-    const recommendation = generateRecommendation(viabilityScore);
+    const viabilityScore = 0; // Placeholder with 0 score
+    const features = generatePlaceholderFeatures();
+    const keyFindings = ['No embryo analyzed yet', 'Upload an image in Assessment Hub to begin analysis'];
+    const recommendation = 'Upload embryo image for analysis';
 
     results.push({
-      id: `embryo-${i + 1}`,
-      name: `Embryo ${i + 1}`,
-      imageUrl: embryoImages[i % embryoImages.length],
+      id: `placeholder-embryo`,
+      name: `Placeholder`,
+      imageUrl: embryoImages[0],
       viabilityScore,
-      rank: 0,
+      rank: 1,
       features,
       keyFindings,
       recommendation
     });
   }
 
-  // Sort by viability score and assign ranks
-  results.sort((a, b) => b.viabilityScore - a.viabilityScore);
-  results.forEach((result, index) => {
-    result.rank = index + 1;
-  });
-
   return results;
+}
+
+function generatePlaceholderFeatures(): EmbryoFeatures {
+  return {
+    developmentalStage: 'Not analyzed',
+    symmetry: 'Fair',
+    fragmentation: 'Unknown'
+  };
 }
 
 function generateViabilityScore(index: number): number {

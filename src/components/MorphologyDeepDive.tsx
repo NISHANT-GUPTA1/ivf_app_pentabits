@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { EmbryoResult } from '../types/embryo';
 
 interface MorphologyDeepDiveProps {
@@ -13,23 +14,23 @@ const scoringRules = [
 ];
 
 export function MorphologyDeepDive({ embryoData }: MorphologyDeepDiveProps) {
-  if (embryoData.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 max-w-md">
-          <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-          </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Morphology Data</h3>
-          <p className="text-sm text-gray-500 mb-4">
-            Upload embryo images to analyze morphological features
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Filter out placeholder embryo
+  const realEmbryos = embryoData.filter(e => e.id !== 'placeholder-embryo');
+  const [showQCPanel, setShowQCPanel] = useState(false);
+  const [reviewedEmbryos, setReviewedEmbryos] = useState<Set<string>>(new Set());
+  const [escalatedEmbryos, setEscalatedEmbryos] = useState<Set<string>>(new Set());
   
-  const symmetryBreakdown = embryoData.reduce<Record<string, number>>((acc, embryo) => {
+  const handleMarkReviewed = (embryoId: string) => {
+    setReviewedEmbryos(prev => new Set(prev).add(embryoId));
+  };
+  
+  const handleEscalate = (embryoId: string) => {
+    setEscalatedEmbryos(prev => new Set(prev).add(embryoId));
+  };
+  
+  const pendingReviewCount = realEmbryos.length - reviewedEmbryos.size;
+  
+  const symmetryBreakdown = realEmbryos.reduce<Record<string, number>>((acc, embryo) => {
     const symmetry = embryo.features.symmetry;
     acc[symmetry] = (acc[symmetry] || 0) + 1;
     return acc;
@@ -45,9 +46,14 @@ export function MorphologyDeepDive({ embryoData }: MorphologyDeepDiveProps) {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs bg-purple-50 text-purple-700 px-3 py-1.5 rounded-full font-semibold border border-purple-100">
-            QC review pending: 2
+            QC review pending: {pendingReviewCount}
           </span>
-          <button className="px-3 py-1.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800">Open QC panel</button>
+          <button 
+            onClick={() => setShowQCPanel(!showQCPanel)}
+            className="px-3 py-1.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800"
+          >
+            {showQCPanel ? 'Close QC panel' : 'Open QC panel'}
+          </button>
         </div>
       </header>
 
@@ -75,8 +81,14 @@ export function MorphologyDeepDive({ embryoData }: MorphologyDeepDiveProps) {
             <h3 className="text-lg font-semibold text-gray-900">Symmetry Snapshot</h3>
             <span className="text-xs text-gray-500">Live cohort</span>
           </div>
-          <div className="space-y-3">
-            {Object.entries(symmetryBreakdown).map(([label, value]) => (
+          {realEmbryos.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-sm text-gray-500 mb-2">No embryo data yet</p>
+              <p className="text-xs text-gray-400">Upload images to see symmetry analysis</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {Object.entries(symmetryBreakdown).map(([label, value]) => (
               <div key={label} className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-purple-500" />
                 <div className="flex-1">
@@ -84,51 +96,87 @@ export function MorphologyDeepDive({ embryoData }: MorphologyDeepDiveProps) {
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-purple-500 to-indigo-500"
-                      style={{ width: `${Math.min(100, (value / embryoData.length) * 100)}%` }}
+                      style={{ width: `${Math.min(100, (value / realEmbryos.length) * 100)}%` }}
                     />
                   </div>
                 </div>
                 <div className="text-sm font-semibold text-gray-800">{value}</div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Manual Review Queue</h3>
-          <button className="text-sm text-purple-700 font-semibold px-3 py-1.5 rounded-lg border border-purple-100 hover:bg-purple-50">
-            Assign reviewer
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {embryoData.slice(0, 6).map((embryo) => (
-            <div key={embryo.id} className="border border-gray-100 rounded-lg p-4 bg-gray-50">
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-sm font-semibold text-gray-900">{embryo.name}</div>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-orange-50 text-orange-700 font-semibold">Needs check</span>
-              </div>
-              <p className="text-sm text-gray-600 mb-2">{embryo.features.developmentalStage}</p>
-              <ul className="text-xs text-gray-700 space-y-1">
-                <li>Symmetry: <span className="font-semibold text-gray-900">{embryo.features.symmetry}</span></li>
-                <li>Fragmentation: <span className="font-semibold text-gray-900">{embryo.features.fragmentation}</span></li>
-                {embryo.features.trophectoderm && (
-                  <li>TE: <span className="font-semibold text-gray-900">{embryo.features.trophectoderm}</span></li>
-                )}
-                {embryo.features.innerCellMass && (
-                  <li>ICM: <span className="font-semibold text-gray-900">{embryo.features.innerCellMass}</span></li>
-                )}
-              </ul>
-              <div className="mt-3 flex items-center gap-2 text-xs font-semibold">
-                <button className="flex-1 bg-gray-900 text-white rounded-md py-2 hover:bg-gray-800">Mark reviewed</button>
-                <button className="flex-1 border border-gray-200 rounded-md py-2 text-gray-800 hover:bg-gray-100">Escalate</button>
-              </div>
             </div>
-          ))}
+          )}
         </div>
       </section>
+
+      {showQCPanel && (
+        <section className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Manual Review Queue</h3>
+            <button className="text-sm text-purple-700 font-semibold px-3 py-1.5 rounded-lg border border-purple-100 hover:bg-purple-50">
+              Assign reviewer
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {realEmbryos.map((embryo) => {
+              const isReviewed = reviewedEmbryos.has(embryo.id);
+              const isEscalated = escalatedEmbryos.has(embryo.id);
+              
+              return (
+                <div key={embryo.id} className={`border rounded-lg p-4 ${
+                  isReviewed ? 'border-green-200 bg-green-50' : 
+                  isEscalated ? 'border-red-200 bg-red-50' : 
+                  'border-gray-100 bg-gray-50'
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-gray-900">{embryo.name}</div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
+                      isReviewed ? 'bg-green-100 text-green-700' :
+                      isEscalated ? 'bg-red-100 text-red-700' :
+                      'bg-orange-50 text-orange-700'
+                    }`}>
+                      {isReviewed ? 'Reviewed' : isEscalated ? 'Escalated' : 'Needs check'}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">{embryo.features.developmentalStage}</p>
+                  <ul className="text-xs text-gray-700 space-y-1">
+                    <li>Symmetry: <span className="font-semibold text-gray-900">{embryo.features.symmetry}</span></li>
+                    <li>Fragmentation: <span className="font-semibold text-gray-900">{embryo.features.fragmentation}</span></li>
+                    {embryo.features.trophectoderm && (
+                      <li>TE: <span className="font-semibold text-gray-900">{embryo.features.trophectoderm}</span></li>
+                    )}
+                    {embryo.features.innerCellMass && (
+                      <li>ICM: <span className="font-semibold text-gray-900">{embryo.features.innerCellMass}</span></li>
+                    )}
+                  </ul>
+                  <div className="mt-3 flex items-center gap-2 text-xs font-semibold">
+                    <button 
+                      onClick={() => handleMarkReviewed(embryo.id)}
+                      disabled={isReviewed || isEscalated}
+                      className={`flex-1 rounded-md py-2 transition-colors ${
+                        isReviewed ? 'bg-green-600 text-white cursor-not-allowed' :
+                        'bg-gray-900 text-white hover:bg-gray-800'
+                      }`}
+                    >
+                      {isReviewed ? '✓ Reviewed' : 'Mark reviewed'}
+                    </button>
+                    <button 
+                      onClick={() => handleEscalate(embryo.id)}
+                      disabled={isReviewed || isEscalated}
+                      className={`flex-1 border rounded-md py-2 transition-colors ${
+                        isEscalated ? 'border-red-600 bg-red-600 text-white cursor-not-allowed' :
+                        'border-gray-200 text-gray-800 hover:bg-gray-100'
+                      }`}
+                    >
+                      {isEscalated ? '⚠ Escalated' : 'Escalate'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

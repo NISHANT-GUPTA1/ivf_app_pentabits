@@ -29,7 +29,7 @@ export function ViabilityChart({ embryoData, selectedEmbryo }: ViabilityChartPro
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <h3 className="text-sm font-medium text-gray-900 mb-4">Viability Score by Embryo</h3>
       
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={282.5}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
           <XAxis 

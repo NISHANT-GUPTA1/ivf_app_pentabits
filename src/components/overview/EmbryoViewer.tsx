@@ -55,7 +55,7 @@ export function EmbryoViewer({ embryo, onSelectEmbryo, allEmbryos }: EmbryoViewe
       </div>
 
       {/* Main embryo image */}
-      <div className="relative bg-gray-900 rounded-lg overflow-hidden mb-6" style={{ height: '400px' }}>
+      <div className="relative bg-gray-900 rounded-lg overflow-hidden mb-6" style={{ height: '411px' }}>
         <img
           src={embryo.imageUrl}
           alt={embryo.name}
