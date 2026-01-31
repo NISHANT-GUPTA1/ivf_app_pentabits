@@ -11,7 +11,7 @@ yarn.lock
 *.env.development
 .idea
 .vscode
-
+test_predict_client.py
 # Python
 venv/
 __pycache__/
