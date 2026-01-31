@@ -11,7 +11,7 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   const sections = [
     { id: 'overview' as const, icon: Activity, label: 'Embryo Overview' },
     { id: 'assessment' as const, icon: Microscope, label: 'Assessment Hub' },
-    { id: 'explainability' as const, icon: Brain, label: 'AI Explainability' },
+    // explainability removed from main nav - shown inline in Assessment Hub
     { id: 'development' as const, icon: TrendingUp, label: 'Development Stage' },
     { id: 'morphology' as const, icon: Layers, label: 'Morphology' },
     { id: 'viability' as const, icon: Target, label: 'Viability Scores' },
