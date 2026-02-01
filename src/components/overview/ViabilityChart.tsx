@@ -7,10 +7,6 @@ interface ViabilityChartProps {
 }
 
 export function ViabilityChart({ embryoData, selectedEmbryo }: ViabilityChartProps) {
-  if (embryoData.length === 0) {
-    return null;
-  }
-  
   const data = embryoData.map((embryo, index) => ({
     name: `E${index + 1}`,
     score: embryo.viabilityScore,

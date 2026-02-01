@@ -6,14 +6,8 @@ interface QualityMetricsChartProps {
 }
 
 export function QualityMetricsChart({ embryoData }: QualityMetricsChartProps) {
-  // Filter out placeholder embryo
-  const realEmbryos = embryoData.filter(e => e.id !== 'placeholder-embryo');
-  const hasOnlyPlaceholder = realEmbryos.length === 0;
-  
   // Use real-time data from comprehensiveAnalysis if available, otherwise fallback
-  const data = hasOnlyPlaceholder ? [
-    { name: 'E1', ICM: 0, TE: 0 }
-  ] : realEmbryos.map((embryo, index) => {
+  const data = embryoData.map((embryo, index) => {
     // Try to get from comprehensiveAnalysis first (real-time)
     let icmScore = 0;
     let teScore = 0;
@@ -47,20 +41,6 @@ export function QualityMetricsChart({ embryoData }: QualityMetricsChartProps) {
       TE: teScore
     };
   });
-
-  // Only show "no data" message if there's truly no data and no placeholder
-  if (data.length === 0 && !hasOnlyPlaceholder) {
-    return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-sm font-medium text-gray-900 mb-4">
-          Inner Cell Mass & Trophectoderm Quality
-        </h3>
-        <div className="h-[260px] flex items-center justify-center text-sm text-gray-500">
-          No blastocyst data available
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">

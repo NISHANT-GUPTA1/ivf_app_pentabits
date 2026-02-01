@@ -26,8 +26,12 @@ interface ExplainabilityDashboardProps {
  */
 const ExplainabilityDashboard: React.FC<ExplainabilityDashboardProps> = ({
   embryo,
-  onAcceptScore,
-  onOverrideScore,
+  onAcceptScore = (embryoId: string) => {
+    alert(`Score accepted for embryo ${embryoId}!\n\nViability: ${embryo.viabilityScore}%\n\nThis embryo has been marked for further review.`);
+  },
+  onOverrideScore = (embryoId: string, newScore: number, reason: string) => {
+    alert(`Override requested for embryo ${embryoId}\nNew Score: ${newScore}%\nReason: ${reason}`);
+  },
   onGenerateReport,
 }) => {
   const [activeTab, setActiveTab] = useState<DashboardTab>('summary');

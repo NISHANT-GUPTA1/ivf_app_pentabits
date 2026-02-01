@@ -6,10 +6,6 @@ interface StageDistributionProps {
 }
 
 export function StageDistribution({ embryoData }: StageDistributionProps) {
-  if (embryoData.length === 0) {
-    return null;
-  }
-  
   const stageCounts = embryoData.reduce((acc, embryo) => {
     const stage = embryo.features.developmentalStage;
     if (stage.includes('Blastocyst')) {

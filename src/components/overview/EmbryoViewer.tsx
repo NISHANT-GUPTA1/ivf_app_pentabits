@@ -8,11 +8,14 @@ interface EmbryoViewerProps {
 }
 
 export function EmbryoViewer({ embryo, onSelectEmbryo, allEmbryos }: EmbryoViewerProps) {
-  if (!embryo || allEmbryos.length === 0) {
+  // Use the first embryo if no embryo is selected
+  const currentEmbryo = embryo || (allEmbryos.length > 0 ? allEmbryos[0] : null);
+  
+  if (!currentEmbryo || allEmbryos.length === 0) {
     return null;
   }
   
-  const currentIndex = allEmbryos.findIndex(e => e.id === embryo.id);
+  const currentIndex = allEmbryos.findIndex(e => e.id === currentEmbryo.id);
   
   const handlePrevious = () => {
     const newIndex = currentIndex > 0 ? currentIndex - 1 : allEmbryos.length - 1;
@@ -57,20 +60,20 @@ export function EmbryoViewer({ embryo, onSelectEmbryo, allEmbryos }: EmbryoViewe
       {/* Main embryo image */}
       <div className="relative bg-gray-900 rounded-lg overflow-hidden mb-6" style={{ height: '411px' }}>
         <img
-          src={embryo.imageUrl}
-          alt={embryo.name}
+          src={currentEmbryo.imageUrl}
+          alt={currentEmbryo.name}
           className="w-full h-full object-cover"
         />
         
         {/* Overlay info */}
         <div className="absolute top-4 left-4 right-4 flex items-start justify-between">
           <div className="bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
-            <p className="text-white font-medium">{embryo.name}</p>
-            <p className="text-gray-300 text-sm">{embryo.features.developmentalStage}</p>
+            <p className="text-white font-medium">{currentEmbryo.name}</p>
+            <p className="text-gray-300 text-sm">{currentEmbryo.features.developmentalStage}</p>
           </div>
           
-          <div className={`${getScoreColor(embryo.viabilityScore)} rounded-lg px-3 py-2`}>
-            <p className="text-white font-semibold text-lg">{embryo.viabilityScore}%</p>
+          <div className={`${getScoreColor(currentEmbryo.viabilityScore)} rounded-lg px-3 py-2`}>
+            <p className="text-white font-semibold text-lg">{currentEmbryo.viabilityScore}%</p>
           </div>
         </div>
 
@@ -89,32 +92,32 @@ export function EmbryoViewer({ embryo, onSelectEmbryo, allEmbryos }: EmbryoViewe
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-xs text-gray-600 mb-1">Symmetry</p>
-          <p className="font-medium text-gray-900">{embryo.features.symmetry}</p>
+          <p className="font-medium text-gray-900">{currentEmbryo.features.symmetry}</p>
         </div>
         
         <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-xs text-gray-600 mb-1">Fragmentation</p>
-          <p className="font-medium text-gray-900">{embryo.features.fragmentation}</p>
+          <p className="font-medium text-gray-900">{currentEmbryo.features.fragmentation}</p>
         </div>
 
-        {embryo.features.innerCellMass && (
+        {currentEmbryo.features.innerCellMass && (
           <div className="bg-gray-50 rounded-lg p-4">
             <p className="text-xs text-gray-600 mb-1">Inner Cell Mass</p>
-            <p className="font-medium text-gray-900">{embryo.features.innerCellMass}</p>
+            <p className="font-medium text-gray-900">{currentEmbryo.features.innerCellMass}</p>
           </div>
         )}
 
-        {embryo.features.trophectoderm && (
+        {currentEmbryo.features.trophectoderm && (
           <div className="bg-gray-50 rounded-lg p-4">
             <p className="text-xs text-gray-600 mb-1">Trophectoderm</p>
-            <p className="font-medium text-gray-900">{embryo.features.trophectoderm}</p>
+            <p className="font-medium text-gray-900">{currentEmbryo.features.trophectoderm}</p>
           </div>
         )}
 
-        {embryo.features.blastocystExpansion && (
+        {currentEmbryo.features.blastocystExpansion && (
           <div className="bg-gray-50 rounded-lg p-4 col-span-2">
             <p className="text-xs text-gray-600 mb-1">Expansion Grade</p>
-            <p className="font-medium text-gray-900">{embryo.features.blastocystExpansion}</p>
+            <p className="font-medium text-gray-900">{currentEmbryo.features.blastocystExpansion}</p>
           </div>
         )}
       </div>

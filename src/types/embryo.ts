@@ -146,6 +146,9 @@ export interface EmbryoResult {
   // NEW: Comprehensive analysis data
   comprehensiveAnalysis?: ComprehensivePrediction;
   
+  // Best embryo selection
+  isSelected?: boolean; // Mark as "best" embryo
+  
   // Manual Override Fields
   manualGrade?: string;
   overrideScore?: number;

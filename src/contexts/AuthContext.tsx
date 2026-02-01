@@ -76,6 +76,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
     apiService.setToken('');
     localStorage.removeItem('auth_token');
+    // Clear all application data on logout
+    localStorage.removeItem('ivf_patients');
+    localStorage.removeItem('ivf_embryos');
+    localStorage.removeItem('ivf_activePatientId');
   };
 
   const value: AuthContextType = {

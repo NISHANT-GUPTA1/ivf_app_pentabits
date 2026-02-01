@@ -50,27 +50,26 @@ async def lifespan(app: FastAPI):
     logger.info("Starting up...")
     load_models()
     create_tables()
+    
+    # Initialize database with default users
+    from init_db import init_db
+    try:
+        init_db()
+        logger.info("Database initialized with default users")
+    except Exception as e:
+        logger.error(f"Error initializing database: {e}")
+    
     logger.info("Ready to serve predictions")
     yield
     logger.info("Shutting down...")
 
 app = FastAPI(title="Embryo Viability API with Audit Trail", lifespan=lifespan)
 
-# CORS middleware
+# CORS middleware - Allow all origins for easier deployment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-        "http://127.0.0.1:3002",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "https://tangerine-tarsier-b28c57.netlify.app"
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins - or specify your domains
+    allow_credentials=False,  # Set to False when using allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -9,7 +9,17 @@ interface OverrideControlsProps {
 
 export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsProps) {
     if (!embryo) {
-        return null;
+        return (
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="flex items-center gap-3 mb-6">
+                    <AlertCircle className="size-6 text-teal-medical" />
+                    <h3 className="text-lg font-semibold text-charcoal">Embryologist Override Controls</h3>
+                </div>
+                <div className="text-center text-gray-500 py-8">
+                    <p>No embryo selected</p>
+                </div>
+            </div>
+        );
     }
     
     const [overrideScore, setOverrideScore] = useState<number | ''>(embryo.overrideScore || '');

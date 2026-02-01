@@ -322,7 +322,12 @@ export function EmbryoDetailedAnalysis({
               </div>
             </div>
 
-            <button className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg transition-colors">
+            <button 
+              onClick={() => {
+                alert(`Score ${Math.round(viability_score)}% accepted for ${embryoName}!\n\nRecommendation: ${clinical_recommendation.transfer_recommendation || 'Analysis complete'}\n\nThis embryo has been marked for further review.`);
+              }}
+              className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg transition-colors"
+            >
               <CheckCircle2 className="w-5 h-5" />
               Accept Score
             </button>

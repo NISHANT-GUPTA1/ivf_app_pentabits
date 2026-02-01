@@ -8,10 +8,6 @@ interface RankingListProps {
 }
 
 export function RankingList({ embryoData, selectedEmbryo, onSelectEmbryo }: RankingListProps) {
-  if (embryoData.length === 0) {
-    return null;
-  }
-  
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-50';
       if (score >= 70) return 'text-teal-medical bg-blush';

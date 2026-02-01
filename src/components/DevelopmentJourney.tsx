@@ -53,10 +53,17 @@ export function DevelopmentJourney({ embryoData }: DevelopmentJourneyProps) {
   ];
   
   const stageCounts = filteredEmbryos.reduce<Record<string, number>>((acc, embryo) => {
-    // Use real-time comprehensiveAnalysis data if available, otherwise fallback
-    const stage = embryo.comprehensiveAnalysis?.morphokinetics?.estimated_developmental_stage 
-      || embryo.features.developmentalStage 
-      || 'Unspecified';
+    // Prioritize real-time comprehensiveAnalysis data
+    let stage = 'Unspecified';
+    
+    if (embryo.comprehensiveAnalysis?.morphokinetics?.estimated_developmental_stage) {
+      stage = embryo.comprehensiveAnalysis.morphokinetics.estimated_developmental_stage;
+    } else if (embryo.comprehensiveAnalysis?.blastocyst_grading?.expansion_description) {
+      stage = embryo.comprehensiveAnalysis.blastocyst_grading.expansion_description;
+    } else if (embryo.features.developmentalStage && embryo.features.developmentalStage !== 'Not analyzed') {
+      stage = embryo.features.developmentalStage;
+    }
+    
     acc[stage] = (acc[stage] || 0) + 1;
     return acc;
   }, {});

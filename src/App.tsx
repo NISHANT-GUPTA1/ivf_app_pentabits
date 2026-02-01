@@ -29,20 +29,21 @@ type ActiveSection =
 export default function App() {
   // Check auth and show LoginForm when not authenticated
   const auth = useAuth();
-  if (auth.isLoading) return (
-    <div className="min-h-screen bg-gradient-to-br from-blush to-lavender flex items-center justify-center">
-      <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-teal-medical mb-4"></div>
-        <p className="text-charcoal font-semibold">Loading EMBRYA...</p>
-      </div>
-    </div>
-  );
-  if (!auth.user) return <LoginForm />;
+  
+  // Initialize all hooks before any conditional returns
   const [viewMode, setViewMode] = useState<ViewMode>("overview");
   const [activeSection, setActiveSection] = useState<ActiveSection>("overview");
   const [allEmbryos, setAllEmbryos] = useState<EmbryoResult[]>(() => {
+    // Only load stored embryos if they exist and are not stale
     const stored = storage.loadEmbryos();
-    return stored.length > 0 ? stored : generateMockEmbryos();
+    // Filter out embryos with invalid blob URLs (from previous sessions)
+    const validEmbryos = stored.filter(e => {
+      if (e.id === 'placeholder-embryo') return true;
+      // Check if imageUrl is a blob URL - these become invalid after page reload
+      if (e.imageUrl.startsWith('blob:')) return false;
+      return true;
+    });
+    return validEmbryos.length > 0 ? validEmbryos : generateMockEmbryos();
   });
   
   // Patient management - load from localStorage
@@ -73,8 +74,12 @@ export default function App() {
   
   // Filter embryos by active patient
   const embryoData = activePatientId 
-    ? allEmbryos.filter(e => e.patientId === activePatientId)
-    : allEmbryos.filter(e => e.id === 'placeholder-embryo'); // Show only placeholder if no patient selected
+    ? (() => {
+        const patientEmbryos = allEmbryos.filter(e => e.patientId === activePatientId);
+        // If no patient embryos, show placeholder
+        return patientEmbryos.length > 0 ? patientEmbryos : allEmbryos.filter(e => e.id === 'placeholder-embryo');
+      })()
+    : allEmbryos; // Show all embryos when no patient selected
   
   const handleUpdateEmbryo = (updated: EmbryoResult) => {
     setAllEmbryos((prev) =>
@@ -90,6 +95,18 @@ export default function App() {
   const handleSelectPatient = (patientId: string | null) => {
     setActivePatientId(patientId);
   };
+
+  // Show loading or login screens after all hooks are initialized
+  if (auth.isLoading) return (
+    <div className="min-h-screen bg-gradient-to-br from-blush to-lavender flex items-center justify-center">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-teal-medical mb-4"></div>
+        <p className="text-charcoal font-semibold">Loading EMBRYA...</p>
+      </div>
+    </div>
+  );
+  
+  if (!auth.user) return <LoginForm />;
 
   return (
     <div className="min-h-screen bg-blush flex">

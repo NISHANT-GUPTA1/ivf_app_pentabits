@@ -5,7 +5,7 @@ interface SummaryCardsProps {
 }
 
 export function SummaryCards({ embryoData }: SummaryCardsProps) {
-  // Exclude placeholder embryo from count
+  // Filter out placeholder embryo from count
   const realEmbryos = embryoData.filter(e => e.id !== 'placeholder-embryo');
   const totalEmbryos = realEmbryos.length;
   
