@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { useAuth } from './contexts/AuthContext';
 import { LoginForm } from './components/LoginForm';
@@ -13,6 +13,7 @@ import { ViabilityInsights } from "./components/ViabilityInsights";
 import { ExplainabilityDashboard } from "./components/ExplainabilityDashboard";
 import { ConfusionMatrix } from "./components/ConfusionMatrix";
 import { generateMockEmbryos } from "./utils/mockAnalysis";
+import { storage } from "./utils/storage";
 import type { EmbryoResult, Patient } from "./types/embryo";
 
 type ViewMode = "overview" | "comparison";
@@ -28,15 +29,47 @@ type ActiveSection =
 export default function App() {
   // Check auth and show LoginForm when not authenticated
   const auth = useAuth();
-  if (auth.isLoading) return <div />;
+  if (auth.isLoading) return (
+    <div className="min-h-screen bg-gradient-to-br from-blush to-lavender flex items-center justify-center">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-teal-medical mb-4"></div>
+        <p className="text-charcoal font-semibold">Loading EMBRYA...</p>
+      </div>
+    </div>
+  );
   if (!auth.user) return <LoginForm />;
   const [viewMode, setViewMode] = useState<ViewMode>("overview");
   const [activeSection, setActiveSection] = useState<ActiveSection>("overview");
-  const [allEmbryos, setAllEmbryos] = useState<EmbryoResult[]>(() => generateMockEmbryos());
+  const [allEmbryos, setAllEmbryos] = useState<EmbryoResult[]>(() => {
+    const stored = storage.loadEmbryos();
+    return stored.length > 0 ? stored : generateMockEmbryos();
+  });
   
-  // Patient management
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [activePatientId, setActivePatientId] = useState<string | null>(null);
+  // Patient management - load from localStorage
+  const [patients, setPatients] = useState<Patient[]>(() => storage.loadPatients());
+  const [activePatientId, setActivePatientId] = useState<string | null>(() => storage.loadActivePatientId());
+  
+  // Selected embryo state - persisted across navigation
+  const [selectedEmbryo, setSelectedEmbryo] = useState<EmbryoResult | null>(null);
+  
+  // Uploaded embryos for current session - persisted across navigation
+  const [uploadedEmbryos, setUploadedEmbryos] = useState<EmbryoResult[]>([]);
+  
+  // Image file - persisted across navigation
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    storage.savePatients(patients);
+  }, [patients]);
+  
+  useEffect(() => {
+    storage.saveEmbryos(allEmbryos);
+  }, [allEmbryos]);
+  
+  useEffect(() => {
+    storage.saveActivePatientId(activePatientId);
+  }, [activePatientId]);
   
   // Filter embryos by active patient
   const embryoData = activePatientId 
@@ -81,6 +114,12 @@ export default function App() {
               onAddPatient={handleAddPatient}
               onSelectPatient={handleSelectPatient}
               onNavigate={setActiveSection}
+              selectedEmbryo={selectedEmbryo}
+              setSelectedEmbryo={setSelectedEmbryo}
+              uploadedEmbryos={uploadedEmbryos}
+              setUploadedEmbryos={setUploadedEmbryos}
+              selectedFile={selectedFile}
+              setSelectedFile={setSelectedFile}
             />
           )}
 

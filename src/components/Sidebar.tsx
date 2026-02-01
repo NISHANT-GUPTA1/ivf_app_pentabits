@@ -42,16 +42,17 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
           <button
             key={section.id}
             onClick={() => onSectionChange(section.id)}
-            className={`group relative w-14 h-14 rounded-lg flex items-center justify-center transition-all ${isActive
-                  ? 'bg-[#FDF6F8] text-teal-medical'
-                  : 'text-charcoal/40 hover:bg-blush hover:text-teal-medical'
-              }`}
+            className={`group relative w-14 h-14 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 hover:shadow-lg ${
+              isActive
+                ? 'bg-[#FDF6F8] text-teal-medical shadow-md scale-105'
+                : 'text-charcoal/40 hover:bg-gradient-to-br hover:from-blush hover:to-[#FDF6F8] hover:text-teal-medical'
+            }`}
             title={section.label}
           >
-            <Icon className="size-6" />
+            <Icon className="size-6 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-125" />
 
             {/* Tooltip */}
-              <div className="absolute left-full ml-4 px-3 py-2 bg-charcoal text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-10">
+              <div className="absolute left-full ml-4 px-3 py-2 bg-charcoal text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-10 shadow-xl">
               {section.label}
             </div>
           </button>

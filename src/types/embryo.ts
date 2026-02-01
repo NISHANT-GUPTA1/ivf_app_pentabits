@@ -140,6 +140,9 @@ export interface EmbryoResult {
   // Patient tracking
   patientId?: string;
   
+  // Development tracking
+  developmentDay?: number; // Day 3, Day 5, etc.
+  
   // NEW: Comprehensive analysis data
   comprehensiveAnalysis?: ComprehensivePrediction;
   

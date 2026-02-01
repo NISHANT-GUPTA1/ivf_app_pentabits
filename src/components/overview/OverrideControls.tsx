@@ -20,6 +20,18 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
     const [isProcessing, setIsProcessing] = useState(false);
 
     const handleSubmit = () => {
+        // Validation: If override score is provided, reason is required
+        if (overrideScore !== '' && !overrideReason) {
+            alert('Override Reason is required when providing an override score.');
+            return;
+        }
+        
+        // At least one field should be filled
+        if (overrideScore === '' && !overrideReason && !manualGrade && !notes) {
+            alert('Please fill at least one field to submit an override.');
+            return;
+        }
+        
         setIsProcessing(true);
         
         // Simulate processing time

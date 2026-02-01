@@ -30,6 +30,64 @@ export function MorphologyDeepDive({ embryoData }: MorphologyDeepDiveProps) {
   
   const pendingReviewCount = realEmbryos.length - reviewedEmbryos.size;
   
+  // Calculate average scores from real embryo data
+  const calculateAverageScores = () => {
+    if (realEmbryos.length === 0) {
+      return [
+        { label: 'Symmetry', detail: 'Cell distribution and radial balance', score: 'N/A', color: 'gray' },
+        { label: 'Fragmentation', detail: 'Cytoplasmic debris & exclusion bodies', score: 'N/A', color: 'gray' },
+        { label: 'Trophectoderm', detail: 'Cohesion and epithelial uniformity', score: 'N/A', color: 'gray' },
+        { label: 'Inner Cell Mass', detail: 'Density and compaction quality', score: 'N/A', color: 'gray' },
+        { label: 'Expansion', detail: 'Blastocoel volume & thinning', score: 'N/A', color: 'gray' },
+      ];
+    }
+    
+    // Calculate average viability score
+    const avgViability = realEmbryos.reduce((sum, e) => sum + e.viabilityScore, 0) / realEmbryos.length;
+    
+    // Calculate average circularity (symmetry indicator)
+    const avgCircularity = realEmbryos.reduce((sum, e) => {
+      const circ = e.comprehensiveAnalysis?.morphological_analysis?.circularity_score || 0;
+      return sum + circ;
+    }, 0) / realEmbryos.length;
+    
+    // Calculate average fragmentation
+    const avgFragmentation = realEmbryos.reduce((sum, e) => {
+      const frag = e.comprehensiveAnalysis?.morphological_analysis?.fragmentation_percentage || 0;
+      return sum + frag;
+    }, 0) / realEmbryos.length;
+    
+    // Calculate average ICM and TE grades
+    const icmGrades = realEmbryos.map(e => e.comprehensiveAnalysis?.blastocyst_grading?.inner_cell_mass_grade);
+    const teGrades = realEmbryos.map(e => e.comprehensiveAnalysis?.blastocyst_grading?.trophectoderm_grade);
+    
+    const gradeToScore = (grades: (string | undefined)[]) => {
+      const scores = grades.map(g => g === 'A' ? 90 : g === 'B' ? 75 : g === 'C' ? 55 : 40);
+      return scores.reduce((a, b) => a + b, 0) / scores.length;
+    };
+    
+    const avgICM = gradeToScore(icmGrades);
+    const avgTE = gradeToScore(teGrades);
+    
+    // Determine color based on score (green = good, yellow = moderate, red = poor)
+    const getColor = (score: number, inverse = false) => {
+      if (inverse) {
+        return score < 20 ? 'emerald' : score < 40 ? 'amber' : 'red';
+      }
+      return score >= 70 ? 'emerald' : score >= 50 ? 'amber' : 'red';
+    };
+    
+    return [
+      { label: 'Symmetry', detail: 'Cell distribution and radial balance', score: `${Math.round(avgCircularity * 100)}%`, color: getColor(avgCircularity * 100) },
+      { label: 'Fragmentation', detail: 'Cytoplasmic debris & exclusion bodies', score: `${Math.round(avgFragmentation)}%`, color: getColor(avgFragmentation, true) },
+      { label: 'Trophectoderm', detail: 'Cohesion and epithelial uniformity', score: `${Math.round(avgTE)}%`, color: getColor(avgTE) },
+      { label: 'Inner Cell Mass', detail: 'Density and compaction quality', score: `${Math.round(avgICM)}%`, color: getColor(avgICM) },
+      { label: 'Expansion', detail: 'Blastocoel volume & thinning', score: `${Math.round(avgViability)}%`, color: getColor(avgViability) },
+    ];
+  };
+  
+  const scoringMetrics = calculateAverageScores();
+  
   const symmetryBreakdown = realEmbryos.reduce<Record<string, number>>((acc, embryo) => {
     const symmetry = embryo.features.symmetry;
     acc[symmetry] = (acc[symmetry] || 0) + 1;
@@ -61,16 +119,16 @@ export function MorphologyDeepDive({ embryoData }: MorphologyDeepDiveProps) {
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm xl:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Scoring Matrix</h2>
-            <span className="text-xs text-gray-500">Weighted model inputs</span>
+            <span className="text-xs text-gray-500">Real-time cohort averages</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {scoringRules.map((rule) => (
-              <div key={rule.label} className="border border-gray-100 rounded-lg p-4 bg-gray-50">
+            {scoringMetrics.map((metric) => (
+              <div key={metric.label} className={`border border-gray-100 rounded-lg p-4 bg-${metric.color}-50`}>
                 <div className="flex items-center justify-between mb-1">
-                  <div className="font-semibold text-gray-900">{rule.label}</div>
-                  <span className="text-xs font-semibold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">{rule.weight}</span>
+                  <div className="font-semibold text-gray-900">{metric.label}</div>
+                  <span className={`text-sm font-bold text-${metric.color}-700 bg-${metric.color}-100 px-3 py-1 rounded-full`}>{metric.score}</span>
                 </div>
-                <p className="text-sm text-gray-600">{rule.detail}</p>
+                <p className="text-sm text-gray-600">{metric.detail}</p>
               </div>
             ))}
           </div>
@@ -122,6 +180,17 @@ export function MorphologyDeepDive({ embryoData }: MorphologyDeepDiveProps) {
               const isReviewed = reviewedEmbryos.has(embryo.id);
               const isEscalated = escalatedEmbryos.has(embryo.id);
               
+              // Use comprehensiveAnalysis data if available (real-time), otherwise fallback to features
+              const developmentalStage = embryo.comprehensiveAnalysis?.morphokinetics?.estimated_developmental_stage 
+                || embryo.features.developmentalStage;
+              const symmetry = embryo.features.symmetry;
+              const fragmentation = embryo.comprehensiveAnalysis?.morphological_analysis?.fragmentation_level 
+                || embryo.features.fragmentation;
+              const trophectoderm = embryo.comprehensiveAnalysis?.blastocyst_grading?.trophectoderm_grade 
+                || embryo.features.trophectoderm;
+              const innerCellMass = embryo.comprehensiveAnalysis?.blastocyst_grading?.inner_cell_mass_grade 
+                || embryo.features.innerCellMass;
+              
               return (
                 <div key={embryo.id} className={`border rounded-lg p-4 ${
                   isReviewed ? 'border-green-200 bg-green-50' : 
@@ -138,15 +207,21 @@ export function MorphologyDeepDive({ embryoData }: MorphologyDeepDiveProps) {
                       {isReviewed ? 'Reviewed' : isEscalated ? 'Escalated' : 'Needs check'}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">{embryo.features.developmentalStage}</p>
+                  <p className="text-sm text-gray-600 mb-2">{developmentalStage}</p>
                   <ul className="text-xs text-gray-700 space-y-1">
-                    <li>Symmetry: <span className="font-semibold text-gray-900">{embryo.features.symmetry}</span></li>
-                    <li>Fragmentation: <span className="font-semibold text-gray-900">{embryo.features.fragmentation}</span></li>
-                    {embryo.features.trophectoderm && (
-                      <li>TE: <span className="font-semibold text-gray-900">{embryo.features.trophectoderm}</span></li>
+                    <li>Symmetry: <span className="font-semibold text-gray-900">{symmetry}</span></li>
+                    <li>Fragmentation: <span className="font-semibold text-gray-900">{fragmentation}</span></li>
+                    {trophectoderm && (
+                      <li>TE: <span className="font-semibold text-gray-900">{trophectoderm}</span></li>
                     )}
-                    {embryo.features.innerCellMass && (
-                      <li>ICM: <span className="font-semibold text-gray-900">{embryo.features.innerCellMass}</span></li>
+                    {innerCellMass && (
+                      <li>ICM: <span className="font-semibold text-gray-900">{innerCellMass}</span></li>
+                    )}
+                    {embryo.comprehensiveAnalysis && (
+                      <>
+                        <li>Viability: <span className="font-semibold text-gray-900">{embryo.viabilityScore}%</span></li>
+                        <li>Confidence: <span className="font-semibold text-gray-900">{(embryo.comprehensiveAnalysis.confidence * 100).toFixed(0)}%</span></li>
+                      </>
                     )}
                   </ul>
                   <div className="mt-3 flex items-center gap-2 text-xs font-semibold">

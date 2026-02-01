@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { apiService } from '../services/api';
-import { Upload, RefreshCw, FileUp, X, Check, Brain, ChevronDown, Download, ZoomIn, RotateCcw, Plus, User, Users } from 'lucide-react';
+import { Upload, RefreshCw, FileUp, X, Check, Brain, ChevronDown, Download, ZoomIn, RotateCcw, Plus, User, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { EmbryoResult, ComprehensivePrediction, Patient } from '../types/embryo';
 import { ExplainabilityDashboard } from './ExplainabilityDashboard';
+import { EmbryoDetailedAnalysis } from './EmbryoDetailedAnalysis';
 
 // Helper: normalize partial backend response into ComprehensivePrediction
 function buildComprehensivePrediction(raw: any): ComprehensivePrediction {
+    console.log('[buildComprehensivePrediction] Raw backend data:', raw);
     const features = raw.features || {};
 
     // Derive fragmentation percentage: prefer explicit value, else infer from num_regions or circularity
@@ -17,6 +19,9 @@ function buildComprehensivePrediction(raw: any): ComprehensivePrediction {
     const circularity_score = typeof features.circularity_mean === 'number' ? features.circularity_mean : 0.3;
 
     const viability = typeof raw.viability_score === 'number' ? raw.viability_score : 0;
+    console.log('[buildComprehensivePrediction] Viability from backend:', viability);
+    console.log('[buildComprehensivePrediction] Model predictions:', raw.model_predictions);
+    console.log('[buildComprehensivePrediction] Confidence:', raw.confidence);
 
     const model_confidence_scores = (raw.model_predictions || []).map((m: any) => Number(m.probability_good || 0));
     const agreement_rate = model_confidence_scores.length > 0 ? (model_confidence_scores.reduce((a: number, b: number) => a + b, 0) / model_confidence_scores.length) : 0;
@@ -58,8 +63,16 @@ function buildComprehensivePrediction(raw: any): ComprehensivePrediction {
         blastocyst_grading: {
             expansion_stage: Math.min(6, Math.max(1, Math.round((viability / 100) * 4) + 2)),
             expansion_description: '',
-            inner_cell_mass_grade: viability >= 80 ? 'A' : viability >= 60 ? 'B' : 'C',
-            trophectoderm_grade: viability >= 80 ? 'A' : viability >= 60 ? 'B' : 'C',
+            // Calculate ICM grade based on viability + circularity (cell organization)
+            inner_cell_mass_grade: (() => {
+                const icmScore = (viability * 0.6) + (circularity_score * 100 * 0.4);
+                return icmScore >= 82 ? 'A' : icmScore >= 68 ? 'B' : 'C';
+            })(),
+            // Calculate TE grade based on viability + fragmentation (lower frag = better)
+            trophectoderm_grade: (() => {
+                const teScore = (viability * 0.7) + ((100 - fragmentation_percentage) * 0.3);
+                return teScore >= 80 ? 'A' : teScore >= 65 ? 'B' : 'C';
+            })(),
             overall_grade: `${Math.min(6, Math.max(1, Math.round((viability / 100) * 6)))}${viability >= 80 ? 'AA' : viability >= 60 ? 'AB' : 'BC'}`,
             quality_assessment: ''
         },
@@ -116,16 +129,22 @@ interface AssessmentHubProps {
     onAddPatient: (patient: Patient) => void;
     onSelectPatient: (patientId: string | null) => void;
     onNavigate?: (section: string) => void;
+    selectedEmbryo: EmbryoResult | null;
+    setSelectedEmbryo: React.Dispatch<React.SetStateAction<EmbryoResult | null>>;
+    uploadedEmbryos: EmbryoResult[];
+    setUploadedEmbryos: React.Dispatch<React.SetStateAction<EmbryoResult[]>>;
+    selectedFile: File | null;
+    setSelectedFile: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
-export function AssessmentHub({ embryos, setEmbryos, patients, activePatientId, onAddPatient, onSelectPatient, onNavigate }: AssessmentHubProps) {
+export function AssessmentHub({ embryos, setEmbryos, patients, activePatientId, onAddPatient, onSelectPatient, onNavigate, selectedEmbryo, setSelectedEmbryo, uploadedEmbryos, setUploadedEmbryos, selectedFile, setSelectedFile }: AssessmentHubProps) {
     console.log('[AssessmentHub] render start');
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [successMessage, setSuccessMessage] = useState<string>('');
-    const [uploadedEmbryos, setUploadedEmbryos] = useState<EmbryoResult[]>([]);
-    const [selectedEmbryo, setSelectedEmbryo] = useState<EmbryoResult | null>(null);
+    const [selectedDay, setSelectedDay] = useState<number | 'all'>('all');
+    const [selectedDevelopmentDay, setSelectedDevelopmentDay] = useState<number>(1); // Day for uploading embryo - default to Day 1
+    const [zoomLevel, setZoomLevel] = useState<number>(100);
     const [showPatientModal, setShowPatientModal] = useState(false);
     const [newPatientName, setNewPatientName] = useState('');
     const [newPatientAge, setNewPatientAge] = useState('');
@@ -137,6 +156,11 @@ export function AssessmentHub({ embryos, setEmbryos, patients, activePatientId, 
     // Filter embryos for active patient only
     const patientEmbryos = activePatientId 
         ? embryos.filter(e => e.patientId === activePatientId)
+        : [];
+    
+    // Filter uploadedEmbryos to show only current patient's embryos
+    const patientUploadedEmbryos = activePatientId
+        ? uploadedEmbryos.filter(e => e.patientId === activePatientId)
         : [];
 
     // Generate dynamic cycle ID based on current date
@@ -311,6 +335,8 @@ Report generated by EMBRYA Platform
             // Map backend response to EmbryoResult with comprehensive analysis
             const comprehensiveData: ComprehensivePrediction = buildComprehensivePrediction(data);
             console.log('[handleProcess] comprehensiveData created:', !!comprehensiveData);
+            // Ensure we have a clinical recommendation object available locally to avoid runtime reference errors
+            const clinicalRecommendation = comprehensiveData?.clinical_recommendation || data.clinical_recommendation || { transfer_recommendation: 'No recommendation', transfer_priority: 5, freeze_recommendation: false, discard_recommendation: false, reasoning: [], clinical_notes: '' };
             
             const newEmbryo: EmbryoResult = {
                 id: `emb-${Date.now()}`,
@@ -319,23 +345,23 @@ Report generated by EMBRYA Platform
                 viabilityScore: Math.round(data.viability_score),
                 rank: patientEmbryos.length + 1,
                 patientId: activePatientId || undefined,
+                developmentDay: selectedDevelopmentDay,
                 features: {
-                    developmentalStage: data.morphokinetics?.estimated_developmental_stage || 'Day 5 Blastocyst',
-                    symmetry: data.morphological_analysis?.cell_symmetry?.includes('Excellent') ? 'Excellent' : 
-                             data.morphological_analysis?.cell_symmetry?.includes('Good') ? 'Good' : 
-                             data.morphological_analysis?.cell_symmetry?.includes('Fair') ? 'Fair' : 'Poor',
-                    fragmentation: data.morphological_analysis?.fragmentation_level || 'Unknown',
-                    blastocystExpansion: data.blastocyst_grading?.expansion_stage?.toString() || '3',
-                    innerCellMass: data.blastocyst_grading?.inner_cell_mass_grade || 'B',
-                    trophectoderm: data.blastocyst_grading?.trophectoderm_grade || 'B'
+                    // Prefer normalized comprehensive data; fall back to raw when absent
+                    developmentalStage: comprehensiveData?.morphokinetics?.estimated_developmental_stage || data.morphokinetics?.estimated_developmental_stage || 'Unknown',
+                    symmetry: comprehensiveData?.morphological_analysis?.cell_symmetry || data.morphological_analysis?.cell_symmetry || 'Unknown',
+                    fragmentation: comprehensiveData?.morphological_analysis?.fragmentation_level || data.morphological_analysis?.fragmentation_level || 'Unknown',
+                    blastocystExpansion: String(comprehensiveData?.blastocyst_grading?.expansion_stage ?? data.blastocyst_grading?.expansion_stage ?? ''),
+                    innerCellMass: comprehensiveData?.blastocyst_grading?.inner_cell_mass_grade || data.blastocyst_grading?.inner_cell_mass_grade || 'Unknown',
+                    trophectoderm: comprehensiveData?.blastocyst_grading?.trophectoderm_grade || data.blastocyst_grading?.trophectoderm_grade || 'Unknown'
                 },
                 keyFindings: [
-                    data.clinical_recommendation?.transfer_recommendation || 'Analysis complete',
-                    `Gardner Grade: ${data.blastocyst_grading?.overall_grade || 'N/A'}`,
-                    `Genetic Risk: ${data.genetic_risk?.chromosomal_risk_level || 'Unknown'}`,
-                    `Confidence: ${data.confidence_level} (${(data.confidence * 100).toFixed(0)}%)`
+                    clinicalRecommendation.transfer_recommendation || 'Analysis complete',
+                    `Gardner Grade: ${comprehensiveData.blastocyst_grading?.overall_grade || data.blastocyst_grading?.overall_grade || 'N/A'}`,
+                    `Genetic Risk: ${comprehensiveData.genetic_risk?.chromosomal_risk_level || data.genetic_risk?.chromosomal_risk_level || 'Unknown'}`,
+                    `Confidence: ${comprehensiveData.confidence_level || data.confidence_level || 'N/A'} (${Math.round((comprehensiveData.confidence || data.confidence || 0) * 100)}%)`
                 ],
-                recommendation: data.clinical_recommendation?.transfer_recommendation || 
+                recommendation: clinicalRecommendation.transfer_recommendation || 
                                (data.viability_score >= 70 ? 'Suitable for transfer' : 
                                 data.viability_score >= 50 ? 'Consider for transfer with caution' : 
                                 'Not recommended for transfer'),
@@ -348,19 +374,9 @@ Report generated by EMBRYA Platform
             console.log('[handleProcess] New embryo has comprehensiveAnalysis?', !!newEmbryo.comprehensiveAnalysis);
             console.log('[handleProcess] comprehensiveAnalysis keys:', newEmbryo.comprehensiveAnalysis ? Object.keys(newEmbryo.comprehensiveAnalysis) : 'none');
 
-            // Check if there's a placeholder embryo (first upload should replace it)
-            const hasPlaceholder = embryos.some(e => e.id === 'placeholder-embryo');
-            let updatedEmbryos: EmbryoResult[];
-            
-            if (hasPlaceholder && embryos.length === 1) {
-                // First upload: Replace the placeholder
-                console.log('[handleProcess] Replacing placeholder with first real embryo');
-                updatedEmbryos = [newEmbryo];
-            } else {
-                // Subsequent uploads: Add to existing embryos (excluding any remaining placeholder)
-                const realEmbryos = embryos.filter(e => e.id !== 'placeholder-embryo');
-                updatedEmbryos = [...realEmbryos, newEmbryo];
-            }
+            // Always add to existing embryos, never replace
+            const realEmbryos = embryos.filter(e => e.id !== 'placeholder-embryo');
+            const updatedEmbryos = [...realEmbryos, newEmbryo];
             
             // Sort by viability score (highest first) and update ranks
             updatedEmbryos.sort((a, b) => b.viabilityScore - a.viabilityScore);
@@ -407,6 +423,21 @@ Report generated by EMBRYA Platform
         }
     };
 
+    // Filter uploaded analyses by selected development day (if set)
+    const filteredUploadedEmbryos = patientUploadedEmbryos.filter(e => {
+        if (selectedDay === 'all') return true;
+        return e.developmentDay === selectedDay;
+    });
+
+    // Development day progress stats for current filter
+        const totalForDay = filteredUploadedEmbryos.length;
+        const completedCount = filteredUploadedEmbryos.filter(e => {
+            const day = e.developmentDay ?? 0;
+            if (selectedDay === 'all') return day > 0;
+            return day >= (selectedDay as number);
+        }).length;
+        const dayProgressPercent = totalForDay === 0 ? 0 : Math.round((completedCount / totalForDay) * 100);
+
     return (
         <div className="space-y-6 w-full max-w-screen-2xl mx-auto px-2 sm:px-4">
             {/* Success Message */}
@@ -431,8 +462,8 @@ Report generated by EMBRYA Platform
                 </div>
                 <div className="flex gap-3 flex-wrap">
                     <div className="flex items-center gap-2 text-sm bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
-                        <span className="font-semibold text-gray-900">{uploadedEmbryos.length}</span>
-                        <span className="text-gray-600">Embryos Analyzed</span>
+                        <span className="font-semibold text-gray-900">{patientUploadedEmbryos.length}</span>
+                        <span className="text-gray-600">Embryos Analyzed (This Patient)</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
                         <RefreshCw className={`size-4 ${isProcessing ? 'animate-spin' : ''}`} />
@@ -533,8 +564,31 @@ Report generated by EMBRYA Platform
                                 <p className="text-sm text-gray-500 pl-4 mt-1">High-Resolution Morphological Inspection</p>
                             </div>
                             <div className="flex gap-2">
-                                <button className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors font-medium">Measurements</button>
-                                <button className="px-3 py-1.5 border border-gray-200 text-gray-700 text-sm rounded-lg flex items-center gap-1 hover:bg-gray-50">
+                                <button 
+                                    onClick={() => {
+                                        if (selectedFile) {
+                                            alert('Measurements tool will show: Diameter, Area, Circularity, Fragment size');
+                                        } else {
+                                            alert('Please select an image first');
+                                        }
+                                    }}
+                                    className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                                >
+                                    Measurements
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        if (selectedFile) {
+                                            const link = document.createElement('a');
+                                            link.href = URL.createObjectURL(selectedFile);
+                                            link.download = `embryo_analysis_${Date.now()}.png`;
+                                            link.click();
+                                        } else {
+                                            alert('No image to export');
+                                        }
+                                    }}
+                                    className="px-3 py-1.5 border border-gray-200 text-gray-700 text-sm rounded-lg flex items-center gap-1 hover:bg-gray-50"
+                                >
                                     <Download className="size-3" /> Export
                                 </button>
                             </div>
@@ -542,23 +596,63 @@ Report generated by EMBRYA Platform
 
                         <div className="flex gap-4 mb-4">
                             <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200 flex-1">
+                                <button 
+                                    onClick={() => setZoomLevel(prev => Math.max(50, prev - 25))}
+                                    className="p-1 hover:bg-gray-200 rounded"
+                                    disabled={zoomLevel <= 50}
+                                >
+                                    <span className="text-gray-600">−</span>
+                                </button>
                                 <ZoomIn className="size-5 text-gray-500" />
                                 <span className="text-sm font-medium text-gray-700">Zoom Level</span>
                                 <div className="h-4 w-[1px] bg-gray-300 mx-2"></div>
-                                <span className="text-sm font-bold text-gray-900 ml-auto">100%</span>
+                                <span className="text-sm font-bold text-gray-900 ml-auto">{zoomLevel}%</span>
+                                <button 
+                                    onClick={() => setZoomLevel(prev => Math.min(200, prev + 25))}
+                                    className="p-1 hover:bg-gray-200 rounded"
+                                    disabled={zoomLevel >= 200}
+                                >
+                                    <span className="text-gray-600">+</span>
+                                </button>
                             </div>
-                            <button className="w-12 flex items-center justify-center border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600">
+
+                            {/* Development day selector */}
+                            <div className="w-48">
+                                <label className="text-xs text-gray-500 mb-1 block">Development Day</label>
+                                <select
+                                    value={selectedDay === 'all' ? 'all' : String(selectedDay)}
+                                    onChange={(e) => setSelectedDay(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                                >
+                                    <option value="all">All Days</option>
+                                    <option value="1">Day 1</option>
+                                    <option value="2">Day 2</option>
+                                    <option value="3">Day 3</option>
+                                    <option value="4">Day 4</option>
+                                    <option value="5">Day 5</option>
+                                    <option value="6">Day 6</option>
+                                </select>
+                            </div>
+
+                            <button 
+                                onClick={() => setZoomLevel(100)}
+                                className="w-12 flex items-center justify-center border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600"
+                                title="Reset zoom"
+                            >
                                 <RotateCcw className="size-5" />
                             </button>
                         </div>
 
-                        <div className="flex-1 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl flex items-center justify-center relative overflow-hidden group border border-gray-700 shadow-inner min-h-[360px]">
+                        <div className="flex-1 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl flex items-center justify-center relative overflow-hidden group border border-gray-700 shadow-inner min-h-[410px]">
                             {selectedFile ? (
-                                <img
-                                    src={URL.createObjectURL(selectedFile)}
-                                    alt="Analysis Target"
-                                    className="w-full h-full object-contain"
-                                />
+                                <div className="w-full h-full overflow-auto flex items-center justify-center">
+                                    <img
+                                        src={URL.createObjectURL(selectedFile)}
+                                        alt="Analysis Target"
+                                        className="object-contain transition-transform duration-200"
+                                        style={{ transform: `scale(${zoomLevel / 100})` }}
+                                    />
+                                </div>
                             ) : (
                                 <div className="text-center">
                                     <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
@@ -601,6 +695,32 @@ Report generated by EMBRYA Platform
                             <div className="bg-blue-50 p-2 rounded-lg">
                                 <Upload className="size-5 text-blue-600" />
                             </div>
+                        </div>
+
+                        {/* Development Day for Upload */}
+                        <div className="mb-4 relative z-10">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Embryo Development Day
+                            </label>
+                            <select
+                                value={selectedDevelopmentDay}
+                                onChange={(e) => setSelectedDevelopmentDay(Number(e.target.value))}
+                                className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                {[1, 2, 3, 4, 5, 6, 7].map(day => {
+                                    // Check if previous day has been analyzed for this patient
+                                    const previousDayAnalyzed = day === 1 || patientEmbryos.some(e => e.developmentDay === day - 1);
+                                    return (
+                                        <option key={day} value={day} disabled={!previousDayAnalyzed}>
+                                            Day {day} - {day === 1 ? 'Zygote' : day === 2 ? '2-4 Cells' : day === 3 ? '6-8 Cells' : day === 4 ? 'Morula' : day === 5 ? 'Blastocyst (Early)' : day === 6 ? 'Blastocyst (Expanded)' : 'Blastocyst (Hatching)'}
+                                            {!previousDayAnalyzed ? ' (Locked - Complete previous day first)' : ''}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                            {selectedDevelopmentDay > 1 && !patientEmbryos.some(e => e.developmentDay === selectedDevelopmentDay - 1) && (
+                                <p className="text-xs text-red-600 mt-1">⚠️ Please analyze Day {selectedDevelopmentDay - 1} first before uploading Day {selectedDevelopmentDay}</p>
+                            )}
                         </div>
 
                         <div
@@ -694,7 +814,7 @@ Report generated by EMBRYA Platform
 
                     {/* Viability Score Card - Only show when success message exists (after processing) */}
                     {successMessage && (
-                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm" style={{ height: '428px' }}>
                             <div className="flex justify-between items-start mb-6">
                                 <div>
                                     <h3 className="font-bold text-gray-900 text-lg">Latest Analysis</h3>
@@ -735,70 +855,75 @@ Report generated by EMBRYA Platform
 
                     {/* Inline Explainability Dashboard for the most recent analysis (moved to full-width below) */}
 
-                    {/* Analyzed Embryos List - Only show uploaded embryos */}
-                    {uploadedEmbryos.length > 0 && (
-                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="font-bold text-gray-900 text-lg">Analyzed Embryos</h3>
-                                <span className="text-xs text-gray-500">{uploadedEmbryos.length} total</span>
-                            </div>
-                            <div className="space-y-2 max-h-64 overflow-y-auto">
-                                {uploadedEmbryos.slice().reverse().map((embryo) => (
-                                    <div key={embryo.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <img 
-                                            src={embryo.imageUrl} 
-                                            alt={embryo.name}
-                                            className="w-12 h-12 object-cover rounded-lg border border-gray-200"
-                                        />
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-semibold text-gray-900 text-sm">{embryo.name}</p>
-                                            <p className="text-xs text-gray-500">Rank #{embryo.rank}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className={`font-bold text-lg ${
-                                                embryo.viabilityScore >= 80 ? 'text-green-600' :
-                                                embryo.viabilityScore >= 70 ? 'text-blue-600' :
-                                                embryo.viabilityScore >= 50 ? 'text-amber-600' : 'text-red-600'
-                                            }`}>
-                                                {embryo.viabilityScore}%
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Status Panel */}
-                    <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-5 rounded-xl text-white shadow-lg flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                                <Check className="size-5 text-green-400" />
-                            </div>
-                            <div>
-                                <p className="font-semibold">System Operational</p>
-                                <p className="text-xs text-gray-400">All 3 models loaded</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-2xl font-bold">{uploadedEmbryos.length}</p>
-                            <p className="text-xs text-gray-400">Processed in Session</p>
-                        </div>
-                    </div>
-
                 </div>
             </div>
             
-            {/* Full-width Explainability Dashboard */}
+            {/* Full-width Detailed Analysis Dashboard with Navigation */}
             {selectedEmbryo && selectedEmbryo.comprehensiveAnalysis && (
-                <div className="mt-8 w-full max-w-screen-3xl mx-auto px-2 sm:px-4">
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                        <ExplainabilityDashboard
-                            prediction={selectedEmbryo.comprehensiveAnalysis}
-                            embryoName={selectedEmbryo.name}
-                            imageUrl={selectedEmbryo.imageUrl}
-                        />
-                    </div>
+                <div className="mt-8 w-full">
+                    {/* Navigation Controls - Show when multiple embryos exist */}
+                    {filteredUploadedEmbryos.length > 1 && (
+                        <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={() => {
+                                            const currentIndex = filteredUploadedEmbryos.findIndex(e => e.id === selectedEmbryo.id);
+                                            const prevIndex = currentIndex > 0 ? currentIndex - 1 : filteredUploadedEmbryos.length - 1;
+                                            setSelectedEmbryo(filteredUploadedEmbryos[prevIndex]);
+                                        }}
+                                        className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                                        title="Previous Embryo"
+                                    >
+                                        <ChevronLeft className="size-5 text-gray-700" />
+                                    </button>
+                                    
+                                    <div className="text-center">
+                                        <p className="text-sm font-semibold text-gray-900">{selectedEmbryo.name}</p>
+                                        <p className="text-xs text-gray-500">
+                                            {filteredUploadedEmbryos.findIndex(e => e.id === selectedEmbryo.id) + 1} of {filteredUploadedEmbryos.length} embryos
+                                        </p>
+                                    </div>
+                                    
+                                    <button
+                                        onClick={() => {
+                                            const currentIndex = filteredUploadedEmbryos.findIndex(e => e.id === selectedEmbryo.id);
+                                            const nextIndex = currentIndex < filteredUploadedEmbryos.length - 1 ? currentIndex + 1 : 0;
+                                            setSelectedEmbryo(filteredUploadedEmbryos[nextIndex]);
+                                        }}
+                                        className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                                        title="Next Embryo"
+                                    >
+                                        <ChevronRight className="size-5 text-gray-700" />
+                                    </button>
+                                </div>
+                                
+                                <div className="flex items-center gap-3">
+                                    <div className="text-right">
+                                        <p className="text-xs text-gray-500">Viability Score</p>
+                                        <p className={`text-lg font-bold ${
+                                            selectedEmbryo.viabilityScore >= 80 ? 'text-green-600' :
+                                            selectedEmbryo.viabilityScore >= 70 ? 'text-blue-600' :
+                                            selectedEmbryo.viabilityScore >= 50 ? 'text-amber-600' : 'text-red-600'
+                                        }`}>
+                                            {selectedEmbryo.viabilityScore}%
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-gray-500">Rank</p>
+                                        <p className="text-lg font-bold text-gray-900">#{selectedEmbryo.rank}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <EmbryoDetailedAnalysis
+                        prediction={selectedEmbryo.comprehensiveAnalysis}
+                        embryoName={selectedEmbryo.name}
+                        imageUrl={selectedEmbryo.imageUrl}
+                        developmentDay={selectedEmbryo.developmentDay}
+                    />
                 </div>
             )}
 

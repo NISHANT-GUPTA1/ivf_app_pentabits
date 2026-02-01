@@ -10,24 +10,43 @@ export function QualityMetricsChart({ embryoData }: QualityMetricsChartProps) {
   const realEmbryos = embryoData.filter(e => e.id !== 'placeholder-embryo');
   const hasOnlyPlaceholder = realEmbryos.length === 0;
   
-  // Use placeholder data if no real embryos
+  // Use real-time data from comprehensiveAnalysis if available, otherwise fallback
   const data = hasOnlyPlaceholder ? [
     { name: 'E1', ICM: 0, TE: 0 }
   ] : realEmbryos.map((embryo, index) => {
-    const icmScore = embryo.features.innerCellMass?.includes('A') ? 90 :
-                     embryo.features.innerCellMass?.includes('B') ? 75 :
-                     embryo.features.innerCellMass?.includes('C') ? 55 : 0;
+    // Try to get from comprehensiveAnalysis first (real-time)
+    let icmScore = 0;
+    let teScore = 0;
     
-    const teScore = embryo.features.trophectoderm?.includes('A') ? 90 :
-                    embryo.features.trophectoderm?.includes('B') ? 75 :
-                    embryo.features.trophectoderm?.includes('C') ? 55 : 0;
+    console.log(`[QualityMetricsChart] Embryo ${index + 1}:`, embryo);
+    console.log(`[QualityMetricsChart] comprehensiveAnalysis:`, embryo.comprehensiveAnalysis);
+    
+    if (embryo.comprehensiveAnalysis?.blastocyst_grading) {
+      const icmGrade = embryo.comprehensiveAnalysis.blastocyst_grading.inner_cell_mass_grade;
+      const teGrade = embryo.comprehensiveAnalysis.blastocyst_grading.trophectoderm_grade;
+      
+      console.log(`[QualityMetricsChart] ICM Grade: ${icmGrade}, TE Grade: ${teGrade}`);
+      
+      icmScore = icmGrade === 'A' ? 90 : icmGrade === 'B' ? 75 : icmGrade === 'C' ? 55 : 40;
+      teScore = teGrade === 'A' ? 90 : teGrade === 'B' ? 75 : teGrade === 'C' ? 55 : 40;
+    } else {
+      // Fallback to features if comprehensiveAnalysis not available
+      console.log(`[QualityMetricsChart] Using fallback features`);
+      icmScore = embryo.features.innerCellMass?.includes('A') ? 90 :
+                 embryo.features.innerCellMass?.includes('B') ? 75 :
+                 embryo.features.innerCellMass?.includes('C') ? 55 : 40;
+      
+      teScore = embryo.features.trophectoderm?.includes('A') ? 90 :
+                embryo.features.trophectoderm?.includes('B') ? 75 :
+                embryo.features.trophectoderm?.includes('C') ? 55 : 40;
+    }
 
     return {
       name: `E${index + 1}`,
       ICM: icmScore,
       TE: teScore
     };
-  }); // Removed filter - show all real embryos
+  });
 
   // Only show "no data" message if there's truly no data and no placeholder
   if (data.length === 0 && !hasOnlyPlaceholder) {
