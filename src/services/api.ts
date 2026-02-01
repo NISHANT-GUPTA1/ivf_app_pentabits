@@ -73,20 +73,30 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...this.getHeaders(),
-        ...options.headers,
-      },
-    });
+    console.log(`[API] ${options.method || 'GET'} ${url}`);
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          ...this.getHeaders(),
+          ...options.headers,
+        },
+      });
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`API Error: ${response.status} - ${error}`);
+      console.log(`[API] Response: ${response.status} ${response.statusText}`);
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error(`[API] Error:`, error);
+        throw new Error(`API Error: ${response.status} - ${error}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error(`[API] Request failed:`, error);
+      throw error;
     }
-
-    return response.json();
   }
 
   // Authentication

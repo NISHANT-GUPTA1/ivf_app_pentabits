@@ -340,6 +340,32 @@ def ensemble_predict(features: Dict[str, float]) -> Dict:
         'model_predictions': predictions
     }
 
+# ==================== API ENDPOINTS ====================
+
+@app.get("/")
+async def root():
+    """Root endpoint - API status"""
+    return {
+        "status": "online",
+        "message": "EMBRYA Backend API",
+        "version": "1.0.0",
+        "endpoints": {
+            "health": "/health",
+            "login": "/auth/login",
+            "predict": "/predict",
+            "docs": "/docs"
+        }
+    }
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    models_loaded = len(models) > 0
+    return {
+        "status": "healthy" if models_loaded else "degraded",
+        "models_loaded": len(models),
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
 
 @app.post("/auth/login", response_model=Token)
 async def login(user_credentials: UserLogin, db: Session = Depends(get_db)):

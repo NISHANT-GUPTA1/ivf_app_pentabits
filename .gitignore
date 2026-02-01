@@ -21,3 +21,7 @@ __pycache__/
 .Python
 *.db
 *.sqlite
+
+# Backend data files
+backend/audit_trail.db
+backend/audit_logs.csv
