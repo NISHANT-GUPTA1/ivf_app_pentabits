@@ -217,6 +217,9 @@ export const LoginForm: React.FC = () => {
                   All actions are logged for audit compliance and regulatory compliance
                 </p>
               </div>
+              <p className="text-xs text-slate-500 mt-3 text-center">
+                Click a role to auto-fill demo credentials, then press Login
+              </p>
             </form>
 
             {/* Demo Credentials Section */}
@@ -250,9 +253,7 @@ export const LoginForm: React.FC = () => {
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-slate-500 mt-3 text-center">
-                Click a role to auto-fill demo credentials, then press Login
-              </p>
+              
             </div>
           </div>
 

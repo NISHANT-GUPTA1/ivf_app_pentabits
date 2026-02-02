@@ -17,3 +17,41 @@
 		color: var(--charcoal);
 	}
 }
+
+@keyframes shimmer {
+	0% {
+		background-position: -200% 0;
+	}
+	100% {
+		background-position: 200% 0;
+	}
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes slide-in-from-bottom-2 {
+	from {
+		transform: translateY(0.5rem);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+.animate-in {
+	animation: fade-in 0.2s ease-out;
+}
+.animation-delay-300 {
+	animation-delay: 300ms;
+}
+
+.animation-delay-600 {
+	animation-delay: 600ms;
+}

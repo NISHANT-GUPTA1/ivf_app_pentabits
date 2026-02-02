@@ -194,4 +194,10 @@ export interface Patient {
   createdAt: Date;
   age?: number;
   notes?: string;
+  contact_number?: string;
+  email?: string;
+  address?: string;
+  audit_code?: string;
+  assigned_doctor?: string;
+  dob?: string;
 }
