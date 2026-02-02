@@ -183,18 +183,73 @@ export function DevelopmentJourney({ embryoData }: DevelopmentJourneyProps) {
           <ul className="space-y-3 text-sm text-gray-700">
             <li className="flex items-start gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500 mt-1" />
-              62% of embryos are at or ahead of expected pace for Day 5 blastulation.
+              {(() => {
+                const totalEmbryos = realEmbryos.length;
+                const onPaceEmbryos = realEmbryos.filter(e => {
+                  const day = e.developmentDay || 5;
+                  const expectedDay = 5; // Expected Day 5 blastulation
+                  return day >= expectedDay;
+                }).length;
+                const percentage = totalEmbryos > 0 ? Math.round((onPaceEmbryos / totalEmbryos) * 100) : 0;
+                return `${percentage}% of embryos are at or ahead of expected pace for Day 5 blastulation.`;
+              })()}
             </li>
             <li className="flex items-start gap-2">
               <span className="w-2 h-2 rounded-full bg-blue-500 mt-1" />
-              3 embryos flagged for delayed compaction; recommend re-check in 4 hours.
+              {(() => {
+                const delayedEmbryos = realEmbryos.filter(e => {
+                  const viability = e.comprehensiveAnalysis?.viability_score || e.viabilityScore || 0;
+                  return viability < 60; // Consider embryos below 60% viability as potentially delayed
+                });
+                const count = delayedEmbryos.length;
+                return count > 0
+                  ? `${count} embryo${count !== 1 ? 's' : ''} flagged for low viability; recommend re-assessment.`
+                  : 'All embryos showing normal development progress.';
+              })()}
             </li>
             <li className="flex items-start gap-2">
               <span className="w-2 h-2 rounded-full bg-orange-500 mt-1" />
-              Observe one morula with asymmetric cell mass; manual review suggested.
+              {(() => {
+                const asymmetricEmbryos = realEmbryos.filter(e => {
+                  const symmetry = e.comprehensiveAnalysis?.morphological_analysis?.cell_symmetry;
+                  return symmetry && symmetry !== 'Excellent' && symmetry !== 'Good';
+                });
+                const count = asymmetricEmbryos.length;
+                return count > 0
+                  ? `${count} embryo${count !== 1 ? 's' : ''} with asymmetric cell mass detected; manual review suggested.`
+                  : 'No significant asymmetries detected in embryo cohort.';
+              })()}
             </li>
           </ul>
-          <button className="mt-4 w-full border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+          <button 
+            onClick={() => {
+              const snapshot = {
+                timestamp: new Date().toISOString(),
+                reportDate: new Date().toLocaleString(),
+                totalEmbryos: realEmbryos.length,
+                embryos: realEmbryos.map(e => ({
+                  id: e.id,
+                  name: e.name,
+                  developmentDay: e.developmentDay || 5,
+                  viabilityScore: e.comprehensiveAnalysis?.viability_score || e.viabilityScore || 0,
+                  grade: e.comprehensiveAnalysis?.blastocyst_grading?.overall_grade || 'N/A',
+                  recommendation: e.comprehensiveAnalysis?.clinical_recommendation?.priority_ranking || 'N/A',
+                  keyFindings: e.keyFindings || []
+                }))
+              };
+              
+              const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `embryo-development-snapshot-${new Date().toISOString().split('T')[0]}.json`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+            }}
+            className="mt-4 w-full border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+          >
             Export development snapshot
           </button>
         </div>

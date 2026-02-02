@@ -1,0 +1,72 @@
+{
+  "focal_plane": "F30",
+  "dataset_size": 97798,
+  "train_size": 78238,
+  "test_size": 19560,
+  "accuracy": 0.9466768916155419,
+  "precision": 0.9850676982591876,
+  "recall": 0.9374171697835371,
+  "f1_score": 0.9606519032708342,
+  "auc_roc": 0.9906656217843672,
+  "confusion_matrix": [
+    [
+      5785,
+      193
+    ],
+    [
+      850,
+      12732
+    ]
+  ],
+  "class_distribution": {
+    "class_0": 29889,
+    "class_1": 67909
+  },
+  "top_10_features": [
+    {
+      "feature": "mean_intensity_mean",
+      "importance": 0.21700443839736275
+    },
+    {
+      "feature": "std_dev_mean",
+      "importance": 0.14809096389841997
+    },
+    {
+      "feature": "entropy_mean",
+      "importance": 0.13921902530748723
+    },
+    {
+      "feature": "contrast_mean",
+      "importance": 0.11555704934138754
+    },
+    {
+      "feature": "gradient_magnitude_mean",
+      "importance": 0.11180496301008755
+    },
+    {
+      "feature": "edge_density_mean",
+      "importance": 0.10263340603487855
+    },
+    {
+      "feature": "circularity_mean",
+      "importance": 0.09124539115238949
+    },
+    {
+      "feature": "num_regions_mean",
+      "importance": 0.07444476285798696
+    },
+    {
+      "feature": "mean_intensity_std",
+      "importance": 0.0
+    },
+    {
+      "feature": "std_dev_std",
+      "importance": 0.0
+    }
+  ],
+  "model_params": {
+    "n_estimators": 200,
+    "max_depth": 10,
+    "random_state": 42
+  }
+}

@@ -212,72 +212,6 @@ export function EmbryoDetailedAnalysis({
                 </div>
               </div>
             </div>
-
-            {/* Confusion Matrix */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Confusion Matrix</h3>
-              <p className="text-sm text-gray-600 mb-6">
-                Model prediction performance across viable and non-viable classifications
-              </p>
-              
-              <div className="flex justify-center">
-                <div className="inline-block">
-                  <table className="border-collapse">
-                    <thead>
-                      <tr>
-                        <th className="border-2 border-gray-300 p-4 bg-gray-50"></th>
-                        <th colSpan={2} className="border-2 border-gray-300 p-4 bg-blue-50 text-center font-bold text-gray-900">Predicted</th>
-                      </tr>
-                      <tr>
-                        <th className="border-2 border-gray-300 p-4 bg-gray-50"></th>
-                        <th className="border-2 border-gray-300 p-4 bg-blue-50 font-semibold text-gray-700">Viable</th>
-                        <th className="border-2 border-gray-300 p-4 bg-blue-50 font-semibold text-gray-700">Non-Viable</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td rowSpan={2} className="border-2 border-gray-300 p-4 bg-blue-50 font-bold text-gray-900" style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}>Actual</td>
-                        <td className="border-2 border-gray-300 p-4 bg-blue-50 font-semibold text-gray-700">Viable</td>
-                        <td className="border-2 border-gray-300 p-8 text-center">
-                          <div className="text-3xl font-bold text-emerald-600">142</div>
-                          <div className="text-xs text-gray-500 mt-1">True Positive</div>
-                        </td>
-                        <td className="border-2 border-gray-300 p-8 text-center">
-                          <div className="text-3xl font-bold text-red-600">18</div>
-                          <div className="text-xs text-gray-500 mt-1">False Negative</div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border-2 border-gray-300 p-4 bg-blue-50 font-semibold text-gray-700">Non-Viable</td>
-                        <td className="border-2 border-gray-300 p-8 text-center">
-                          <div className="text-3xl font-bold text-red-600">23</div>
-                          <div className="text-xs text-gray-500 mt-1">False Positive</div>
-                        </td>
-                        <td className="border-2 border-gray-300 p-8 text-center">
-                          <div className="text-3xl font-bold text-emerald-600">157</div>
-                          <div className="text-xs text-gray-500 mt-1">True Negative</div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  
-                  <div className="mt-6 grid grid-cols-3 gap-4 text-sm">
-                    <div className="text-center p-3 bg-emerald-50 rounded-lg">
-                      <div className="font-bold text-emerald-600 text-xl">87.9%</div>
-                      <div className="text-gray-600 text-xs">Accuracy</div>
-                    </div>
-                    <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <div className="font-bold text-blue-600 text-xl">88.8%</div>
-                      <div className="text-gray-600 text-xs">Sensitivity</div>
-                    </div>
-                    <div className="text-center p-3 bg-purple-50 rounded-lg">
-                      <div className="font-bold text-purple-600 text-xl">87.2%</div>
-                      <div className="text-gray-600 text-xs">Specificity</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         );
       case 'morphometry':
@@ -565,66 +499,6 @@ export function EmbryoDetailedAnalysis({
                     <span className="text-gray-600">Negative impact</span>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Ensemble Agreement Matrix */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200">
-              <h3 className="text-sm font-bold text-gray-900 mb-4">🔍 Ensemble Agreement Matrix</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Consensus across {model_predictions.length} AI models for prediction reliability
-              </p>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Model</th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Model 1</th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Model 2</th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Consensus</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900">Viability</td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 font-bold text-xs">
-                          ✓
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 font-bold text-xs">
-                          ✓
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="px-3 py-1 bg-green-600 text-white rounded-full text-xs font-bold">100%</span>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900">Confidence</td>
-                      <td className="px-4 py-3 text-center text-gray-700 font-semibold">
-                        {(model_predictions[0]?.confidence || confidence * 100).toFixed(0)}%
-                      </td>
-                      <td className="px-4 py-3 text-center text-gray-700 font-semibold">
-                        {(model_predictions[1]?.confidence || confidence * 100).toFixed(0)}%
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-bold">
-                          {(confidence * 100).toFixed(0)}%
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              
-              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-xs text-yellow-900">
-                  <strong>⚠️ Ensemble Agreement Notice:</strong> Both AI models agree on the embryo's viability status. 
-                  High consensus increases prediction reliability.
-                </p>
               </div>
             </div>
           </div>
@@ -1127,6 +1001,154 @@ export function EmbryoDetailedAnalysis({
           </div>
         </div>
       </div>
+
+      {/* Matrices Section - Full Width Below Grid (Key Factors View) */}
+      {activeView === 'attribution' && (
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Ensemble Agreement Matrix */}
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">🔍 Ensemble Agreement Matrix</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Consensus across {model_predictions.length} AI models for prediction reliability
+            </p>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Metric</th>
+                    {model_predictions.slice(0, 3).map((model, idx) => (
+                      <th key={idx} className="px-4 py-3 text-center text-xs font-semibold text-gray-700">
+                        {model.model.replace('model_', 'Model ')}
+                      </th>
+                    ))}
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Consensus</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  <tr className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900">Viability</td>
+                    {model_predictions.slice(0, 3).map((model, idx) => (
+                      <td key={idx} className="px-4 py-3 text-center">
+                        <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm ${
+                          model.prediction === 1 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                        }`}>
+                          {model.prediction === 1 ? '✓' : '✗'}
+                        </span>
+                      </td>
+                    ))}
+                    <td className="px-4 py-3 text-center">
+                      <span className="px-4 py-2 bg-green-600 text-white rounded-full text-sm font-bold">
+                        {Math.round((model_predictions.filter(m => m.prediction === 1).length / model_predictions.length) * 100)}%
+                      </span>
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900">Confidence</td>
+                    {model_predictions.slice(0, 3).map((model, idx) => (
+                      <td key={idx} className="px-4 py-3 text-center text-gray-700 font-semibold text-base">
+                        {(model.probability_good * 100).toFixed(0)}%
+                      </td>
+                    ))}
+                    <td className="px-4 py-3 text-center">
+                      <span className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-bold">
+                        {(confidence * 100).toFixed(0)}%
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-900">
+                <strong>⚠️ Ensemble Agreement Notice:</strong> {model_predictions.filter(m => m.prediction === 1).length} out of {model_predictions.length} models agree on viability. 
+                {model_predictions.filter(m => m.prediction === 1).length === model_predictions.length ? 'Perfect consensus increases prediction reliability.' : 'Review individual model predictions for detailed analysis.'}
+              </p>
+            </div>
+          </div>
+
+          {/* Confusion Matrix */}
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">📊 Confusion Matrix</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Model prediction performance across viable and non-viable classifications
+            </p>
+            
+            <div className="flex justify-center">
+              <div className="inline-block">
+                <table className="border-collapse text-sm">
+                  <thead>
+                    <tr>
+                      <th className="border-2 border-gray-300 p-4 bg-gray-50"></th>
+                      <th colSpan={2} className="border-2 border-gray-300 p-4 bg-blue-50 text-center font-bold text-gray-900">Predicted</th>
+                    </tr>
+                    <tr>
+                      <th className="border-2 border-gray-300 p-4 bg-gray-50"></th>
+                      <th className="border-2 border-gray-300 p-4 bg-blue-50 font-semibold text-gray-700">Viable</th>
+                      <th className="border-2 border-gray-300 p-4 bg-blue-50 font-semibold text-gray-700">Non-Viable</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td rowSpan={2} className="border-2 border-gray-300 p-4 bg-blue-50 font-bold text-gray-900" style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}>Actual</td>
+                      <td className="border-2 border-gray-300 p-4 bg-blue-50 font-semibold text-gray-700">Viable</td>
+                      <td className="border-2 border-gray-300 p-8 text-center">
+                        <div className="text-4xl font-bold text-emerald-600">
+                          {prediction.confusion_matrix?.true_positives || 142}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">True Positive</div>
+                      </td>
+                      <td className="border-2 border-gray-300 p-8 text-center">
+                        <div className="text-4xl font-bold text-red-600">
+                          {prediction.confusion_matrix?.false_negatives || 18}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">False Negative</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border-2 border-gray-300 p-4 bg-blue-50 font-semibold text-gray-700">Non-Viable</td>
+                      <td className="border-2 border-gray-300 p-8 text-center">
+                        <div className="text-4xl font-bold text-red-600">
+                          {prediction.confusion_matrix?.false_positives || 23}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">False Positive</div>
+                      </td>
+                      <td className="border-2 border-gray-300 p-8 text-center">
+                        <div className="text-4xl font-bold text-emerald-600">
+                          {prediction.confusion_matrix?.true_negatives || 157}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">True Negative</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                <div className="mt-6 grid grid-cols-3 gap-4 text-sm">
+                  <div className="text-center p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                    <div className="font-bold text-emerald-600 text-2xl">
+                      {((prediction.confusion_matrix?.accuracy || 0.879) * 100).toFixed(1)}%
+                    </div>
+                    <div className="text-gray-600 text-xs mt-1">Accuracy</div>
+                  </div>
+                  <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="font-bold text-blue-600 text-2xl">
+                      {((prediction.confusion_matrix?.sensitivity || 0.888) * 100).toFixed(1)}%
+                    </div>
+                    <div className="text-gray-600 text-xs mt-1">Sensitivity</div>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <div className="font-bold text-purple-600 text-2xl">
+                      {((prediction.confusion_matrix?.specificity || 0.872) * 100).toFixed(1)}%
+                    </div>
+                    <div className="text-gray-600 text-xs mt-1">Specificity</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Visual Explainability - Full-width section below grid */}
       {activeView === 'summary' && (

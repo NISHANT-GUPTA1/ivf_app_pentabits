@@ -87,6 +87,7 @@ export interface ModelPrediction {
   prediction: number;
   probability_good: number;
   probability_not_good: number;
+  confidence?: number;
 }
 
 // ==================== LEGACY FEATURES (for backward compatibility) ====================
@@ -102,6 +103,17 @@ export interface EmbryoFeatures {
 
 // ==================== COMPREHENSIVE PREDICTION RESPONSE ====================
 
+export interface ConfusionMatrixData {
+  true_positives: number;
+  true_negatives: number;
+  false_positives: number;
+  false_negatives: number;
+  accuracy: number;
+  sensitivity: number;
+  specificity: number;
+  precision: number;
+}
+
 export interface ComprehensivePrediction {
   prediction: string;
   viability_score: number;
@@ -109,6 +121,7 @@ export interface ComprehensivePrediction {
   confidence_level: string;
   model_predictions: ModelPrediction[];
   features: Record<string, number>;
+  confusion_matrix?: ConfusionMatrixData;
   
   // Clinical Analysis
   morphological_analysis: MorphologicalAnalysis;
@@ -193,10 +206,12 @@ export interface Patient {
   cycleNumber: number;
   createdAt: Date;
   age?: number;
-  notes?: string;
-  contact_number?: string;
+  patientId?: string;
+  mobile?: string;
   email?: string;
   address?: string;
+  notes?: string;
+  contact_number?: string;
   audit_code?: string;
   assigned_doctor?: string;
   dob?: string;
