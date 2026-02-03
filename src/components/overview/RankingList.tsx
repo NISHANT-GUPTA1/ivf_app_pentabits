@@ -51,15 +51,32 @@ export function RankingList({ embryoData, selectedEmbryo, onSelectEmbryo }: Rank
                       {embryo.name}
                     </span>
                     {rankBadge && <span className="text-base">{rankBadge}</span>}
+                    {embryo.overrideScore && (
+                      <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-semibold rounded">
+                        OVERRIDE
+                      </span>
+                    )}
                   </div>
-                  <div className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getScoreColor(embryo.viabilityScore)}`}>
-                    {embryo.viabilityScore}%
+                  <div className="flex flex-col items-end gap-1">
+                    <div className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getScoreColor(embryo.overrideScore || embryo.viabilityScore)}`}>
+                      {embryo.overrideScore || embryo.viabilityScore}%
+                    </div>
+                    {embryo.overrideScore && (
+                      <span className="text-[10px] text-gray-400 line-through">
+                        {embryo.viabilityScore}%
+                      </span>
+                    )}
                   </div>
                 </div>
 
                   <p className="text-xs text-charcoal/70 line-clamp-2">
-                  {embryo.recommendation}
+                  {embryo.overrideReason || embryo.recommendation}
                 </p>
+                {embryo.manualGrade && (
+                  <p className="text-[10px] text-teal-medical mt-1 font-medium">
+                    Manual Grade: {embryo.manualGrade}
+                  </p>
+                )}
               </div>
             </button>
           );

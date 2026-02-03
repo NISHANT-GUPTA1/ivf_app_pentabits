@@ -72,8 +72,18 @@ export function EmbryoViewer({ embryo, onSelectEmbryo, allEmbryos }: EmbryoViewe
             <p className="text-gray-300 text-sm">{currentEmbryo.features.developmentalStage}</p>
           </div>
           
-          <div className={`${getScoreColor(currentEmbryo.viabilityScore)} rounded-lg px-3 py-2`}>
-            <p className="text-white font-semibold text-lg">{currentEmbryo.viabilityScore}%</p>
+          <div className="flex flex-col gap-2">
+            <div className={`${getScoreColor(currentEmbryo.overrideScore || currentEmbryo.viabilityScore)} rounded-lg px-3 py-2`}>
+              <p className="text-white font-semibold text-lg">{currentEmbryo.overrideScore || currentEmbryo.viabilityScore}%</p>
+              {currentEmbryo.overrideScore && (
+                <p className="text-white text-xs">Override</p>
+              )}
+            </div>
+            {currentEmbryo.overrideScore && (
+              <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2 py-1">
+                <p className="text-gray-400 text-xs line-through">{currentEmbryo.viabilityScore}%</p>
+              </div>
+            )}
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AlertCircle, CheckCircle2, Save, X } from 'lucide-react';
 import type { EmbryoResult } from '../../types/embryo';
+import { apiService } from '../../services/api';
 
 interface OverrideControlsProps {
     embryo: EmbryoResult | null;
@@ -29,7 +30,7 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
     const [showSuccess, setShowSuccess] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         // Validation: If override score is provided, reason is required
         if (overrideScore !== '' && !overrideReason) {
             alert('Override Reason is required when providing an override score.');
@@ -44,8 +45,36 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
         
         setIsProcessing(true);
         
-        // Simulate processing time
-        setTimeout(() => {
+        try {
+            // Save override to backend database if override score is provided
+            if (typeof overrideScore === 'number') {
+                try {
+                    const embryoNumericId = parseInt(embryo.id.replace(/\D/g, '')) || Date.now();
+                    await apiService.logAiOverride(
+                        embryoNumericId,
+                        embryo.viabilityScore,
+                        overrideScore,
+                        overrideReason || 'Manual override'
+                    );
+                    console.log('✅ Override saved to database:', {
+                        embryoId: embryoNumericId,
+                        originalScore: embryo.viabilityScore,
+                        newScore: overrideScore,
+                        reason: overrideReason
+                    });
+                } catch (apiError: any) {
+                    console.warn('⚠️ Backend API error (override still saved locally):', apiError);
+                    // Check if it's an authentication error
+                    if (apiError.message?.includes('401') || apiError.message?.includes('Unauthorized')) {
+                        console.warn('💡 Backend requires authentication. Override saved locally only.');
+                    } else if (apiError.message?.includes('Failed to fetch') || apiError.message?.includes('NetworkError')) {
+                        console.warn('💡 Backend server not running. Override saved locally only.');
+                    }
+                    // Continue to save locally even if backend fails
+                }
+            }
+            
+            // Update local state in UI (always works, even if backend fails)
             onUpdateEmbryo({
                 ...embryo,
                 overrideScore: typeof overrideScore === 'number' ? overrideScore : undefined,
@@ -58,7 +87,11 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
             // Show success message
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
-        }, 800);
+        } catch (error) {
+            console.error('❌ Unexpected error during override:', error);
+            setIsProcessing(false);
+            alert('An unexpected error occurred. Please try again.');
+        }
     };
 
     return (
@@ -165,7 +198,10 @@ export function OverrideControls({ embryo, onUpdateEmbryo }: OverrideControlsPro
             {showSuccess && (
                 <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-lg text-sm text-emerald-700 border border-emerald-200">
                     <CheckCircle2 className="size-4" />
-                    Override saved successfully! Changes have been applied to {embryo.name}.
+                    <div className="flex-1">
+                        <p className="font-medium">Override saved successfully!</p>
+                        <p className="text-xs text-emerald-600 mt-0.5">Changes have been applied to {embryo.name}. Changes are saved locally in your browser.</p>
+                    </div>
                 </div>
             )}
 

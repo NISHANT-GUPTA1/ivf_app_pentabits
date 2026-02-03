@@ -184,6 +184,8 @@ export interface ConfusionMatrixData {
   precision: number;
   recall: number;
   f1_score: number;
+  sensitivity?: number;  // TPR - can be calculated from TP/(TP+FN)
+  specificity?: number;  // TNR - can be calculated from TN/(TN+FP)
 }
 
 // ==================== MODEL PERFORMANCE ====================
