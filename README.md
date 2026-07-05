@@ -4,7 +4,7 @@
 
 > Embryo morphological analysis and viability scoring platform for IVF clinics and embryologists.
 
-[Live Demo](https://embryaivf.netlify.app/))| [Report Bug](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues) | [Request Feature](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues)
+[Live Demo](https://embryaivf.netlify.app/)| [Report Bug](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues) | [Request Feature](https://github.com/Ronitjaiswal30/ivf_app_pentabits/issues)
 ![Embrya](./images/logo.jpeg)
 ---
 
